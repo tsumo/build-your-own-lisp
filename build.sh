@@ -12,5 +12,5 @@ fi
 
 mkdir -p bin
 
-cc -std=c99 -Wall "$1" -o "./bin/${1%.*}"
+cc -std=c99 -Wall "$1" -ledit -o "./bin/${1%.*}"
 
