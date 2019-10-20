@@ -1,4 +1,5 @@
 #include "mpc.h"
+#include "utils.h"
 
 
 /* Counts number of nodes in a parse tree */
@@ -50,7 +51,7 @@ int max_children(mpc_ast_t* t) {
         int children = t->children_num;
         for (int i = 0; i < t->children_num; i++) {
             int x = max_children(t->children[i]);
-            children = children > x ? children : x;
+            children = max(children, x);
         }
         return children;
     }

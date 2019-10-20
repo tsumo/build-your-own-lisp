@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "mpc.h"
 #include "tree.h"
+#include "utils.h"
 
 #include <editline/readline.h>
 /* #include <editline/histedit.h> */
@@ -12,6 +14,10 @@ long eval_op(long x, char* op, long y) {
     if (strcmp(op, "-") == 0) { return x - y; }
     if (strcmp(op, "*") == 0) { return x * y; }
     if (strcmp(op, "/") == 0) { return x / y; }
+    if (strcmp(op, "%") == 0) { return x % y; }
+    if (strcmp(op, "^") == 0) { return pow(x, y); }
+    if (strcmp(op, "min") == 0) { return min(x, y); }
+    if (strcmp(op, "max") == 0) { return max(x, y); }
     return 0;
 }
 
@@ -51,7 +57,8 @@ int main(int argc, char** argv) {
     mpca_lang(MPCA_LANG_DEFAULT,
         "                                                      \
             number   : /-?[0-9]+/ ;                            \
-            operator : '+' | '-' | '*' | '/' ;                 \
+            operator : '+' | '-' | '*' | '/' | '%' | '^' |     \
+                       \"min\" | \"max\" ;                     \
             expr     : <number> | '(' <operator> <expr>+ ')' ; \
             lispy    : /^/ <operator> <expr>+ /$/ ;            \
         ",
