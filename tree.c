@@ -15,6 +15,7 @@ int nodes_num(mpc_ast_t* t) {
 }
 
 
+/* Counts number of leaves in a parse tree */
 int leaves_num(mpc_ast_t* t) {
     if (t->children_num == 0) { return 1; }
     if (t->children_num >= 1) {
@@ -28,6 +29,7 @@ int leaves_num(mpc_ast_t* t) {
 }
 
 
+/* Counts number of branches in a parse tree */
 int branches_num(mpc_ast_t* t) {
     if (t->children_num == 0) { return 0; }
     if (t->children_num >= 1) {
@@ -36,6 +38,21 @@ int branches_num(mpc_ast_t* t) {
             total = total + branches_num(t->children[i]);
         }
         return total;
+    }
+    return 0;
+}
+
+
+/* Finds the most number of children spanning from one branch */
+int max_children(mpc_ast_t* t) {
+    if (t->children_num == 0) { return 0; }
+    if (t->children_num >= 1) {
+        int children = t->children_num;
+        for (int i = 0; i < t->children_num; i++) {
+            int x = max_children(t->children[i]);
+            children = children > x ? children : x;
+        }
+        return children;
     }
     return 0;
 }

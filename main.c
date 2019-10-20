@@ -75,6 +75,7 @@ int main(int argc, char** argv) {
             printf("Number of nodes: %i\n", nodes_num(r.output));
             printf("Number of leaves: %i\n", leaves_num(r.output));
             printf("Number of branches: %i\n", branches_num(r.output));
+            printf("Max children: %i\n", max_children(r.output));
             mpc_ast_delete(r.output);
         } else {
             mpc_err_print(r.error);
