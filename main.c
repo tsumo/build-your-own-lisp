@@ -34,7 +34,13 @@ long eval(mpc_ast_t* t) {
     /* Store third child in x */
     long x = eval(t->children[2]);
 
-    /* Iterate through remaining children and combine results */
+    /* When "-" receives one argument, it should negate it */
+    if (strcmp(op, "-") == 0 && !strstr(t->children[3]->tag, "expr")) {
+        return -x;
+    }
+
+    /* Iterate through remaining children and combine results.
+       "expr" check stops iteration on the ")" node. */
     int i = 3;
     while (strstr(t->children[i]->tag, "expr")) {
         x = eval_op(x, op, eval(t->children[i]));
