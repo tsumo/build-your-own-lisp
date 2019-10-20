@@ -12,5 +12,5 @@ fi
 
 mkdir -p bin
 
-cc -std=c99 -Wall "$1" mpc.c -ledit -lm -o "./bin/${1%.*}"
+cc -std=c99 -Wall "$1" mpc.c tree.c -ledit -lm -o "./bin/${1%.*}"
 

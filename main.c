@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "mpc.h"
+#include "tree.h"
 
 #include <editline/readline.h>
 /* #include <editline/histedit.h> */
@@ -69,7 +70,11 @@ int main(int argc, char** argv) {
         if (mpc_parse("<stdin>", input, Lispy, &r)) {
             /* Evaluate parse tree */
             long result = eval(r.output);
+            mpc_ast_print(r.output);
             printf("%li\n", result);
+            printf("Number of nodes: %i\n", nodes_num(r.output));
+            printf("Number of leaves: %i\n", leaves_num(r.output));
+            printf("Number of branches: %i\n", branches_num(r.output));
             mpc_ast_delete(r.output);
         } else {
             mpc_err_print(r.error);
