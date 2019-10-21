@@ -4,58 +4,10 @@
 #include "mpc.h"
 #include "tree.h"
 #include "utils.h"
+#include "lval.h"
 
 #include <editline/readline.h>
 /* #include <editline/histedit.h> */
-
-
-/* Result of evaluation */
-typedef struct {
-    int type;
-    long num;
-    int err;
-} lval;
-
-/* lval types */
-enum { LVAL_NUM, LVAL_ERR };
-
-/* lval errors */
-enum { LERR_DIV_ZERO, LERR_BAD_OP, LERR_BAD_NUM };
-
-/* Create new lval of type "number" */
-lval lval_num(long x) {
-    lval v;
-    v.type = LVAL_NUM;
-    v.num = x;
-    return v;
-}
-
-/* Create new lval of type "error" */
-lval lval_err(int x) {
-    lval v;
-    v.type = LVAL_ERR;
-    v.err = x;
-    return v;
-}
-
-void lval_print(lval v) {
-    switch (v.type) {
-        case LVAL_NUM: printf("%li", v.num); break;
-        case LVAL_ERR:
-           if (v.err == LERR_DIV_ZERO) {
-               printf("Error: division by zero!");
-           }
-           if (v.err == LERR_BAD_OP) {
-               printf("Error: invalid operator!");
-           }
-           if (v.err == LERR_BAD_NUM) {
-               printf("Error: invalid number!");
-           }
-           break;
-    }
-}
-
-void lval_println(lval v) { lval_print(v); putchar('\n'); }
 
 
 lval eval_op(lval x, char* op, lval y) {
