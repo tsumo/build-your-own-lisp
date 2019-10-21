@@ -22,7 +22,7 @@ lval eval_op(lval x, char* op, lval y) {
             ? lval_err(LERR_DIV_ZERO)
             : lval_num(x.num / y.num);
     }
-    if (strcmp(op, "%") == 0) { return lval_num(x.num * y.num); }
+    if (strcmp(op, "%") == 0) { return lval_num(x.num % y.num); }
     if (strcmp(op, "^") == 0) { return lval_num(pow(x.num, y.num)); }
     if (strcmp(op, "min") == 0) { return lval_num(min(x.num, y.num)); }
     if (strcmp(op, "max") == 0) { return lval_num(max(x.num, y.num)); }
