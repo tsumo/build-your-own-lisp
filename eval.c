@@ -20,7 +20,7 @@ lval* lval_eval_sexpr(lval* v) {
     lval* f = lval_pop(v, 0);
     if (f->type != LVAL_SYM) {
         lval_del(f); lval_del(v);
-        return lval_err("S-expression does not start with symbol!");
+        return lval_err("S-expression does not start with symbol");
     }
     // Call builtin with operator
     lval* result = builtin_op(v, f->sym);
@@ -61,7 +61,7 @@ lval* builtin_op(lval* a, char* op) {
         if (strcmp(op, "/") == 0 || strcmp(op, "%") == 0) {
             if (y->num == 0) {
                 lval_del(x); lval_del(y);
-                x = lval_err("Division or modulo by zero!"); break;
+                x = lval_err("Division or modulo by zero"); break;
             }
             if (strcmp(op, "/") == 0) {
                 x->num /= y->num;

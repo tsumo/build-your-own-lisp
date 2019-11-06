@@ -61,7 +61,7 @@ lval* lval_read_num(mpc_ast_t* t) {
     long x = strtol(t->contents, NULL, 10);
     return errno != ERANGE
         ? lval_num(x)
-        : lval_err("invalid number");
+        : lval_err("Invalid number");
 }
 
 
