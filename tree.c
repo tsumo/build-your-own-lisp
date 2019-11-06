@@ -2,7 +2,7 @@
 #include "utils.h"
 
 
-/* Counts number of nodes in a parse tree */
+// Counts number of nodes in a parse tree
 int nodes_num(mpc_ast_t* t) {
     if (t->children_num == 0) { return 1; }
     if (t->children_num >= 1) {
@@ -16,7 +16,7 @@ int nodes_num(mpc_ast_t* t) {
 }
 
 
-/* Counts number of leaves in a parse tree */
+// Counts number of leaves in a parse tree
 int leaves_num(mpc_ast_t* t) {
     if (t->children_num == 0) { return 1; }
     if (t->children_num >= 1) {
@@ -30,7 +30,7 @@ int leaves_num(mpc_ast_t* t) {
 }
 
 
-/* Counts number of branches in a parse tree */
+// Counts number of branches in a parse tree
 int branches_num(mpc_ast_t* t) {
     if (t->children_num == 0) { return 0; }
     if (t->children_num >= 1) {
@@ -44,7 +44,7 @@ int branches_num(mpc_ast_t* t) {
 }
 
 
-/* Finds the most number of children spanning from one branch */
+// Finds the most number of children spanning from one branch
 int max_children(mpc_ast_t* t) {
     if (t->children_num == 0) { return 0; }
     if (t->children_num >= 1) {

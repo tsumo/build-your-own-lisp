@@ -6,19 +6,19 @@
 #include "eval.h"
 
 #include <editline/readline.h>
-/* #include <editline/histedit.h> */
+// #include <editline/histedit.h>
 
 
 int main(int argc, char** argv) {
 
-    /* Parsers */
+    // Parsers
     mpc_parser_t* Number = mpc_new("number");
     mpc_parser_t* Symbol = mpc_new("symbol");
     mpc_parser_t* Sexpr  = mpc_new("sexpr");
     mpc_parser_t* Expr   = mpc_new("expr");
     mpc_parser_t* Lispy  = mpc_new("lispy");
 
-    /* Language */
+    // Language
     mpca_lang(MPCA_LANG_DEFAULT,
         "                                                    \
             number : /-?[0-9]+/ ;                            \
@@ -34,21 +34,21 @@ int main(int argc, char** argv) {
     puts("Press Ctrl+c to exit\n");
 
     while (1) {
-        /* Output prompt and get input */
+        // Output prompt and get input
         char* input = readline("lispy> ");
         add_history(input);
 
-        /* Parse input */
+        // Parse input
         mpc_result_t r;
         if (mpc_parse("<stdin>", input, Lispy, &r)) {
-            /* Evaluate parse tree */
+            // Evaluate parse tree
             lval* x = lval_eval(lval_read(r.output));
             lval_println(x);
-            /* mpc_ast_print(r.output); */
-            /* printf("Number of nodes: %i\n", nodes_num(r.output)); */
-            /* printf("Number of leaves: %i\n", leaves_num(r.output)); */
-            /* printf("Number of branches: %i\n", branches_num(r.output)); */
-            /* printf("Max children: %i\n", max_children(r.output)); */
+            // mpc_ast_print(r.output);
+            // printf("Number of nodes: %i\n", nodes_num(r.output));
+            // printf("Number of leaves: %i\n", leaves_num(r.output));
+            // printf("Number of branches: %i\n", branches_num(r.output));
+            // printf("Max children: %i\n", max_children(r.output));
             lval_del(x);
         } else {
             mpc_err_print(r.error);

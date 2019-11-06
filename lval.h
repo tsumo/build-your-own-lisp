@@ -1,19 +1,19 @@
 #ifndef LVAL_H
 #define LVAL_H
 
-/* Result of evaluation */
+// Result of evaluation
 typedef struct lval {
     int type;
     long num;
-    /* Error and Symbol types have some string data */
+    // Error and Symbol types have some string data
     char* err;
     char* sym;
-    /* Count and pointer to a list of lval* */
+    // Count and pointer to a list of lval*
     int count;
     struct lval** cell;
 } lval;
 
-/* lval types */
+// lval types
 enum { LVAL_ERR, LVAL_NUM, LVAL_SYM, LVAL_SEXPR };
 
 lval* lval_num(long);

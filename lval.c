@@ -2,7 +2,7 @@
 #include "mpc.h"
 #include "lval.h"
 
-/* Constructors of pointers to a new lval structs */
+// Constructors of pointers to a new lval structs
 lval* lval_num(long x) {
     lval* v = malloc(sizeof(lval));
     v->type = LVAL_NUM;
@@ -37,21 +37,21 @@ lval* lval_sexpr(void) {
 
 void lval_del(lval* v) {
     switch (v->type) {
-        /* Do nothing special for number type */
+        // Do nothing special for number type
         case LVAL_NUM: break;
-        /* For Errors or Symbols free the string data */
+        // For Errors or Symbols free the string data
         case LVAL_ERR: free(v->err); break;
         case LVAL_SYM: free(v->sym); break;
-        /* Recursively free up Sexprs */
+        // Recursively free up Sexprs
         case LVAL_SEXPR:
            for (int i = 0; i < v->count; i++) {
                lval_del(v->cell[i]);
            }
-           /* Also free the memory allocated to contain the pointers */
+           // Also free the memory allocated to contain the pointers
            free(v->cell);
            break;
     }
-    /* Free the memory of the lval struct itself */
+    // Free the memory of the lval struct itself
     free(v);
 }
 
@@ -66,14 +66,14 @@ lval* lval_read_num(mpc_ast_t* t) {
 
 
 lval* lval_read(mpc_ast_t* t) {
-    /* For Symbol or Number return conversion to that type */
+    // For Symbol or Number return conversion to that type
     if (strstr(t->tag, "number")) { return lval_read_num(t); }
     if (strstr(t->tag, "symbol")) { return lval_sym(t->contents); }
-    /* For root (>) or Sexpr create empty list */
+    // For root (>) or Sexpr create empty list
     lval* x = NULL;
     if (strcmp(t->tag, ">") == 0) { x = lval_sexpr(); }
     if (strstr(t->tag, "sexpr"))  { x = lval_sexpr(); }
-    /* Fill this list with any valid expressions contained within */
+    // Fill this list with any valid expressions contained within
     for (int i = 0; i < t->children_num; i++) {
         if (strcmp(t->children[i]->contents, "(") == 0) { continue; }
         if (strcmp(t->children[i]->contents, ")") == 0) { continue; }
@@ -93,19 +93,19 @@ lval* lval_add(lval* v, lval* x) {
 
 
 lval* lval_pop(lval* v, int i) {
-    /* Extract the item at i */
+    // Extract the item at i
     lval* x = v->cell[i];
-    /* Shift the rest of the memory after the item backwards */
+    // Shift the rest of the memory after the item backwards
     memmove(&v->cell[i], &v->cell[i+1], sizeof(lval*) * (v->count-i-1));
-    /* Decrease the count of items in the list */
+    // Decrease the count of items in the list
     v->count--;
-    /* Reallocate the memory used */
+    // Reallocate the memory used
     v->cell = realloc(v->cell, sizeof(lval*) * v->count);
     return x;
 }
 
 
-/* Similar to lval_pop, but deletes the provided list */
+// Similar to lval_pop, but deletes the provided list
 lval* lval_take(lval* v, int i) {
     lval* x = lval_pop(v, i);
     lval_del(v);
@@ -116,9 +116,9 @@ lval* lval_take(lval* v, int i) {
 void lval_expr_print(lval* v, char open, char close) {
     putchar(open);
     for (int i = 0; i < v->count; i++) {
-        /* Print value contained within */
+        // Print value contained within
         lval_print(v->cell[i]);
-        /* Don't print trailing space if last element */
+        // Don't print trailing space if last element
         if (i != (v->count-1)) {
             putchar(' ');
         }
