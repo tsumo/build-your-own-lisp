@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "mpc.h"
-#include "tree.h"
 #include "lval.h"
 #include "eval.h"
 
@@ -45,10 +44,6 @@ int main(int argc, char** argv) {
             lval* x = lval_eval(lval_read(r.output));
             lval_println(x);
             // mpc_ast_print(r.output);
-            // printf("Number of nodes: %i\n", nodes_num(r.output));
-            // printf("Number of leaves: %i\n", leaves_num(r.output));
-            // printf("Number of branches: %i\n", branches_num(r.output));
-            // printf("Max children: %i\n", max_children(r.output));
             lval_del(x);
         } else {
             mpc_err_print(r.error);
