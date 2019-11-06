@@ -12,5 +12,12 @@ fi
 
 mkdir -p bin
 
-cc -std=c99 -Wall "$1" mpc.c utils.c lval.c eval.c -ledit -lm -o "./bin/${1%.*}"
+FILES=(
+    mpc.c
+    utils.c
+    lval.c
+    eval.c
+)
+
+cc -std=c99 -Wall "$1" ${FILES[@]} -ledit -lm -o "./bin/${1%.*}"
 
