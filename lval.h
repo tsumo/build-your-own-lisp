@@ -14,12 +14,13 @@ typedef struct lval {
 } lval;
 
 // lval types
-enum { LVAL_ERR, LVAL_NUM, LVAL_SYM, LVAL_SEXPR };
+enum { LVAL_ERR, LVAL_NUM, LVAL_SYM, LVAL_SEXPR, LVAL_QEXPR };
 
 lval* lval_num(long);
 lval* lval_err(char*);
 lval* lval_sym(char*);
 lval* lval_sexpr(void);
+lval* lval_qexpr(void);
 
 void lval_del(lval*);
 
