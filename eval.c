@@ -1,57 +1,81 @@
 #include "mpc.h"
 #include "lval.h"
 #include "utils.h"
+#include "eval.h"
 
-
-/* Evaluate application of single operation */
-lval eval_op(lval x, char* op, lval y) {
-    if (x.type == LVAL_ERR) { return x; }
-    if (y.type == LVAL_ERR) { return y; }
-
-    if (strcmp(op, "+") == 0) { return lval_num(x.num + y.num); }
-    if (strcmp(op, "-") == 0) { return lval_num(x.num - y.num); }
-    if (strcmp(op, "*") == 0) { return lval_num(x.num * y.num); }
-    if (strcmp(op, "/") == 0) {
-        return y.num == 0
-            ? lval_err(LERR_DIV_ZERO)
-            : lval_num(x.num / y.num);
+lval* lval_eval_sexpr(lval* v) {
+    /* Evaluate children */
+    for (int i = 0; i < v->count; i++) {
+        v->cell[i] = lval_eval(v->cell[i]);
     }
-    if (strcmp(op, "%") == 0) { return lval_num(x.num % y.num); }
-    if (strcmp(op, "^") == 0) { return lval_num(pow(x.num, y.num)); }
-    if (strcmp(op, "min") == 0) { return lval_num(min(x.num, y.num)); }
-    if (strcmp(op, "max") == 0) { return lval_num(max(x.num, y.num)); }
-    return lval_err(LERR_BAD_OP);
+    /* Error checking */
+    for (int i = 0; i < v->count; i++) {
+        if (v->cell[i]->type == LVAL_ERR) { return lval_take(v, i); }
+    }
+    /* Empty expression */
+    if (v->count == 0) { return v; }
+    /* Single expression */
+    if (v->count == 1) { return lval_take(v, 0); }
+    /* Ensure that first element is Symbol */
+    lval* f = lval_pop(v, 0);
+    if (f->type != LVAL_SYM) {
+        lval_del(f); lval_del(v);
+        return lval_err("S-expression does not start with symbol!");
+    }
+    /* Call builtin with operator */
+    lval* result = builtin_op(v, f->sym);
+    lval_del(f);
+    return result;
 }
 
 
-/* Evaluate a parse tree */
-lval eval(mpc_ast_t* t) {
-    /* If tagged as number - convert to long */
-    if (strstr(t->tag, "number")) {
-        errno = 0;
-        long x = strtol(t->contents, NULL, 10);
-        return errno != ERANGE ? lval_num(x) : lval_err(LERR_BAD_NUM);
+lval* lval_eval(lval* v) {
+    /* Evaluate S-expression */
+    if (v->type == LVAL_SEXPR) { return lval_eval_sexpr(v); }
+    /* All other lval types remain the same */
+    return v;
+}
+
+
+lval* builtin_op(lval* a, char* op) {
+    /* Ensure all arguments are numbers */
+    for (int i = 0; i < a->count; i++) {
+        if (a->cell[i]->type != LVAL_NUM) {
+            lval_del(a);
+            return lval_err("Cannot operate on non-number");
+        }
     }
-
-    /* The operator is always the second child, "(" is the first one */
-    char* op = t->children[1]->contents;
-
-    /* Store third child in x */
-    lval x = eval(t->children[2]);
-
+    /* Pop the first element */
+    lval* x = lval_pop(a, 0);
     /* When "-" receives one argument, it should negate it */
-    if (strcmp(op, "-") == 0 && !strstr(t->children[3]->tag, "expr")) {
-        return lval_num(-x.num);
+    if ((strcmp(op, "-") == 0) && a->count == 0) {
+        x->num = -x->num;
     }
+    /* While there are still elements remaining */
+    while (a->count > 0) {
+        lval* y = lval_pop(a, 0);
 
-    /* Iterate through remaining children and combine results.
-       "expr" check stops iteration on the ")" node. */
-    int i = 3;
-    while (strstr(t->children[i]->tag, "expr")) {
-        x = eval_op(x, op, eval(t->children[i]));
-        i++;
+        if (strcmp(op, "+") == 0) { x->num += y->num; }
+        if (strcmp(op, "-") == 0) { x->num -= y->num; }
+        if (strcmp(op, "*") == 0) { x->num *= y->num; }
+        if (strcmp(op, "/") == 0 || strcmp(op, "%") == 0) {
+            if (y->num == 0) {
+                lval_del(x); lval_del(y);
+                x = lval_err("Division or modulo by zero!"); break;
+            }
+            if (strcmp(op, "/") == 0) {
+                x->num /= y->num;
+            } else {
+                x->num %= y->num;
+            }
+        }
+        if (strcmp(op, "^") == 0) { x->num = pow(x->num, y->num); }
+        if (strcmp(op, "min") == 0) { x->num = min(x->num, y->num); }
+        if (strcmp(op, "max") == 0) { x->num = max(x->num, y->num); }
+
+        lval_del(y);
     }
-
+    lval_del(a);
     return x;
 }
 

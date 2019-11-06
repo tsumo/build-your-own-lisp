@@ -2,23 +2,38 @@
 #define LVAL_H
 
 /* Result of evaluation */
-typedef struct {
+typedef struct lval {
     int type;
     long num;
-    int err;
+    /* Error and Symbol types have some string data */
+    char* err;
+    char* sym;
+    /* Count and pointer to a list of lval* */
+    int count;
+    struct lval** cell;
 } lval;
 
 /* lval types */
-enum { LVAL_NUM, LVAL_ERR };
+enum { LVAL_ERR, LVAL_NUM, LVAL_SYM, LVAL_SEXPR };
 
-/* lval errors */
-enum { LERR_DIV_ZERO, LERR_BAD_OP, LERR_BAD_NUM };
+lval* lval_num(long);
+lval* lval_err(char*);
+lval* lval_sym(char*);
+lval* lval_sexpr(void);
 
-lval lval_num(long);
-lval lval_err(int);
+void lval_del(lval*);
 
-void lval_print(lval);
-void lval_println(lval);
+lval* lval_read_num(mpc_ast_t*);
+lval* lval_read(mpc_ast_t*);
+
+lval* lval_add(lval*, lval*);
+
+lval* lval_pop(lval*, int);
+lval* lval_take(lval*, int);
+
+void lval_expr_print(lval*, char, char);
+void lval_print(lval*);
+void lval_println(lval*);
 
 #endif
 
