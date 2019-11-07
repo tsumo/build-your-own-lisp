@@ -23,7 +23,9 @@ int main(int argc, char** argv) {
         "                                                      \
             number : /-?[0-9]+/ ;                              \
             symbol : '+' | '-' | '*' | '/' | '%' | '^' |       \
-                     \"min\" | \"max\" ;                       \
+                     \"min\" | \"max\" |                       \
+                     \"list\" | \"head\" | \"tail\" |          \
+                     \"join\" | \"eval\" ;                     \
             sexpr  : '(' <expr>* ')' ;                         \
             qexpr  : '{' <expr>* '}' ;                         \
             expr   : <number> | <symbol> | <sexpr> | <qexpr> ; \

@@ -126,6 +126,16 @@ lval* lval_take(lval* v, int i) {
 }
 
 
+lval* lval_join(lval* x, lval* y) {
+    // Add every cell in 'y' to 'x'
+    while (y->count) {
+        x = lval_add(x, lval_pop(y, 0));
+    }
+    lval_del(y);
+    return x;
+}
+
+
 void lval_expr_print(lval* v, char open, char close) {
     putchar(open);
     for (int i = 0; i < v->count; i++) {

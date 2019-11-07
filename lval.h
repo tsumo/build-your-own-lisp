@@ -32,6 +32,8 @@ lval* lval_add(lval*, lval*);
 lval* lval_pop(lval*, int);
 lval* lval_take(lval*, int);
 
+lval* lval_join(lval*, lval*);
+
 void lval_expr_print(lval*, char, char);
 void lval_print(lval*);
 void lval_println(lval*);
