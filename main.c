@@ -22,10 +22,7 @@ int main(int argc, char** argv) {
     mpca_lang(MPCA_LANG_DEFAULT,
         "                                                      \
             number : /-?[0-9]+/ ;                              \
-            symbol : '+' | '-' | '*' | '/' | '%' | '^' |       \
-                     \"min\" | \"max\" |                       \
-                     \"list\" | \"head\" | \"tail\" |          \
-                     \"join\" | \"eval\" ;                     \
+            symbol : /[A-Za-z0-9_+\\-*\\/\\\\=<>!&]+/ ;        \
             sexpr  : '(' <expr>* ')' ;                         \
             qexpr  : '{' <expr>* '}' ;                         \
             expr   : <number> | <symbol> | <sexpr> | <qexpr> ; \
