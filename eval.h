@@ -12,8 +12,12 @@ lval* lval_eval(lenv*, lval*);
 lval* builtin(lenv*, lval*, char*);
 lval* builtin_op(lenv*, lval*, char*);
 
-#define LASSERT(args, cond, err) \
-    if (!(cond)) { lval_del(args); return lval_err(err); }
+#define LASSERT(args, cond, fmt, ...) \
+    if (!(cond)) { \
+        lval* err = lval_err(fmt, ##__VA_ARGS__); \
+        lval_del(args); \
+        return err; \
+    }
 
 lval* builtin_add(lenv*, lval*);
 lval* builtin_sub(lenv*, lval*);

@@ -30,7 +30,7 @@ enum { LVAL_ERR, LVAL_NUM,   LVAL_SYM,
        LVAL_FUN, LVAL_SEXPR, LVAL_QEXPR };
 
 lval* lval_num(long);
-lval* lval_err(char*);
+lval* lval_err(char*, ...);
 lval* lval_sym(char*);
 lval* lval_fun(lbuiltin);
 lval* lval_sexpr(void);
@@ -53,6 +53,8 @@ lval* lval_copy(lval*);
 void lval_expr_print(lval*, char, char);
 void lval_print(lval*);
 void lval_println(lval*);
+
+char* ltype_name(int);
 
 #endif
 

@@ -10,11 +10,20 @@ lval* lval_num(long x) {
     return v;
 }
 
-lval* lval_err(char* m) {
+lval* lval_err(char* fmt, ...) {
     lval* v = malloc(sizeof(lval));
     v->type = LVAL_ERR;
-    v->err = malloc(strlen(m) + 1);
-    strcpy(v->err, m);
+    // Initializing variable argument struct
+    va_list va;
+    va_start(va, fmt);
+    // Allocate space for message
+    v->err = malloc(512);
+    // printf the error string with a maximum of 511 chars
+    vsnprintf(v->err, 511, fmt, va);
+    // Reallocate to number of bytes actually used
+    v->err = realloc(v->err, strlen(v->err)+1);
+    // Cleanup va list
+    va_end(va);
     return v;
 }
 
@@ -80,7 +89,7 @@ lval* lval_read_num(mpc_ast_t* t) {
     long x = strtol(t->contents, NULL, 10);
     return errno != ERANGE
         ? lval_num(x)
-        : lval_err("Invalid number");
+        : lval_err("Invalid number '%s'", t->contents);
 }
 
 
@@ -201,4 +210,17 @@ void lval_print(lval* v) {
 
 
 void lval_println(lval* v) { lval_print(v); putchar('\n'); }
+
+
+char* ltype_name(int t) {
+    switch(t) {
+        case LVAL_ERR: return "Error";
+        case LVAL_NUM: return "Number";
+        case LVAL_SYM: return "Symbol";
+        case LVAL_FUN: return "Function";
+        case LVAL_SEXPR: return "S-Expr";
+        case LVAL_QEXPR: return "Q-Expr";
+    }
+    return "Unknown";
+}
 
