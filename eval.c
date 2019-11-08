@@ -152,6 +152,29 @@ lval* builtin_eval(lenv* e, lval* a) {
     return lval_eval(e, x);
 }
 
+lval* builtin_def(lenv* e, lval* a) {
+    LASSERT(a, a->cell[0]->type == LVAL_QEXPR,
+        "Only Qexpr can be passed to 'def'");
+    // First argument is a symbol list
+    lval* syms = a->cell[0];
+    // Ensure that all elements of first list are symbols
+    for (int i = 0; i < syms->count; i++) {
+        LASSERT(a, syms->cell[i]->type == LVAL_SYM,
+            "Function 'def' cannot define non-symbol");
+    }
+    // Check for correct number of symbols and values
+    LASSERT(a, syms->count == a->count-1,
+        "Unmatching number of symbols and values "
+        "passed to 'def'");
+    // Assign copies of values to symbols
+    for (int i = 0; i< syms->count; i++) {
+        lenv_put(e, syms->cell[i], a->cell[i+1]);
+    }
+    lval_del(a);
+    // Return empty expression on success
+    return lval_sexpr();
+}
+
 lval* builtin_join(lenv* e, lval* a) {
     for (int i = 0; i < a->count; i++) {
         LASSERT(a, a->cell[i]->type == LVAL_QEXPR,

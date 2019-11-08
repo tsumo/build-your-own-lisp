@@ -23,6 +23,7 @@ lval* builtin_head(lenv*, lval*);
 lval* builtin_tail(lenv*, lval*);
 lval* builtin_list(lenv*, lval*);
 lval* builtin_eval(lenv*, lval*);
+lval* builtin_def(lenv*, lval*);
 lval* builtin_join(lenv*, lval*);
 
 #endif
