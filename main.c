@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "mpc.h"
+#include "lenv.h"
 #include "lval.h"
 #include "eval.h"
 
@@ -33,6 +34,10 @@ int main(int argc, char** argv) {
     puts("Lispy version 0.0.0.0.1");
     puts("Press Ctrl+c to exit\n");
 
+    // Create environment
+    lenv* e = lenv_new();
+    lenv_add_builtins(e);
+
     while (1) {
         // Output prompt and get input
         char* input = readline("lispy> ");
@@ -42,10 +47,11 @@ int main(int argc, char** argv) {
         mpc_result_t r;
         if (mpc_parse("<stdin>", input, Lispy, &r)) {
             // Evaluate parse tree
-            lval* x = lval_eval(lval_read(r.output));
+            lval* x = lval_eval(e, lval_read(r.output));
             lval_println(x);
             // mpc_ast_print(r.output);
             lval_del(x);
+            mpc_ast_delete(r.output);
         } else {
             mpc_err_print(r.error);
             mpc_err_delete(r.error);
@@ -54,6 +60,7 @@ int main(int argc, char** argv) {
         free(input);
     }
 
+    lenv_del(e);
     mpc_cleanup(5, Number, Symbol, Sexpr, Qexpr, Expr, Lispy);
 
     return 0;

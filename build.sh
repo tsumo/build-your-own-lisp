@@ -14,8 +14,8 @@ mkdir -p bin
 
 FILES=(
     mpc.c
-    utils.c
     lval.c
+    lenv.c
     eval.c
 )
 

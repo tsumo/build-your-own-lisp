@@ -1,12 +1,12 @@
 #include "mpc.h"
 #include "lval.h"
-#include "utils.h"
+#include "lenv.h"
 #include "eval.h"
 
-lval* lval_eval_sexpr(lval* v) {
+lval* lval_eval_sexpr(lenv* e, lval* v) {
     // Evaluate children
     for (int i = 0; i < v->count; i++) {
-        v->cell[i] = lval_eval(v->cell[i]);
+        v->cell[i] = lval_eval(e, v->cell[i]);
     }
     // Error checking
     for (int i = 0; i < v->count; i++) {
@@ -16,47 +16,51 @@ lval* lval_eval_sexpr(lval* v) {
     if (v->count == 0) { return v; }
     // Single expression
     if (v->count == 1) { return lval_take(v, 0); }
-    // Ensure that first element is Symbol
+    // Ensure that first element is function after evaluation
     lval* f = lval_pop(v, 0);
-    if (f->type != LVAL_SYM) {
+    if (f->type != LVAL_FUN) {
         lval_del(f); lval_del(v);
-        return lval_err("S-expression does not start with symbol");
+        return lval_err("S-expression does not start with function");
     }
-    // Call builtin with operator
-    lval* result = builtin(v, f->sym);
+    // Call function
+    lval* result = f->fun(e, v);
     lval_del(f);
     return result;
 }
 
 
-lval* lval_eval(lval* v) {
+lval* lval_eval(lenv* e, lval* v) {
+    // Lookup symbols in environment
+    if (v->type == LVAL_SYM) {
+        lval* x = lenv_get(e, v);
+        lval_del(v);
+        return x;
+    }
     // Evaluate S-expression
-    if (v->type == LVAL_SEXPR) { return lval_eval_sexpr(v); }
+    if (v->type == LVAL_SEXPR) { return lval_eval_sexpr(e, v); }
     // All other lval types remain the same
     return v;
 }
 
 
-lval* builtin(lval* a, char* func) {
-    if (strcmp("list", func) == 0) { return builtin_list(a); }
-    if (strcmp("head", func) == 0) { return builtin_head(a); }
-    if (strcmp("tail", func) == 0) { return builtin_tail(a); }
-    if (strcmp("join", func) == 0) { return builtin_join(a); }
-    if (strcmp("eval", func) == 0) { return builtin_eval(a); }
+lval* builtin(lenv* e, lval* a, char* func) {
+    if (strcmp("list", func) == 0) { return builtin_list(e, a); }
+    if (strcmp("head", func) == 0) { return builtin_head(e, a); }
+    if (strcmp("tail", func) == 0) { return builtin_tail(e, a); }
+    if (strcmp("join", func) == 0) { return builtin_join(e, a); }
+    if (strcmp("eval", func) == 0) { return builtin_eval(e, a); }
     if (
         strcmp("+", func)   == 0 || strcmp("-", func)   == 0 ||
-        strcmp("min", func) == 0 || strcmp("max", func) == 0 ||
-        strcmp("*", func)   == 0 || strcmp("/", func)   == 0 ||
-        strcmp("%", func)   == 0 || strcmp("^", func)   == 0
+        strcmp("*", func)   == 0 || strcmp("/", func)   == 0
     ) {
-        return builtin_op(a, func);
+        return builtin_op(e, a, func);
     }
     lval_del(a);
     return lval_err("Unknown function");
 }
 
 
-lval* builtin_op(lval* a, char* op) {
+lval* builtin_op(lenv* e, lval* a, char* op) {
     // Ensure all arguments are numbers
     for (int i = 0; i < a->count; i++) {
         if (a->cell[i]->type != LVAL_NUM) {
@@ -77,20 +81,13 @@ lval* builtin_op(lval* a, char* op) {
         if (strcmp(op, "+") == 0) { x->num += y->num; }
         if (strcmp(op, "-") == 0) { x->num -= y->num; }
         if (strcmp(op, "*") == 0) { x->num *= y->num; }
-        if (strcmp(op, "/") == 0 || strcmp(op, "%") == 0) {
+        if (strcmp(op, "/") == 0) {
             if (y->num == 0) {
                 lval_del(x); lval_del(y);
-                x = lval_err("Division or modulo by zero"); break;
+                x = lval_err("Division by zero"); break;
             }
-            if (strcmp(op, "/") == 0) {
-                x->num /= y->num;
-            } else {
-                x->num %= y->num;
-            }
+            x->num /= y->num;
         }
-        if (strcmp(op, "^") == 0) { x->num = pow(x->num, y->num); }
-        if (strcmp(op, "min") == 0) { x->num = min(x->num, y->num); }
-        if (strcmp(op, "max") == 0) { x->num = max(x->num, y->num); }
 
         lval_del(y);
     }
@@ -98,8 +95,23 @@ lval* builtin_op(lval* a, char* op) {
     return x;
 }
 
+lval* builtin_add(lenv* e, lval* a) {
+    return builtin_op(e, a, "+");
+}
 
-lval* builtin_head(lval* a) {
+lval* builtin_sub(lenv* e, lval* a) {
+    return builtin_op(e, a, "-");
+}
+
+lval* builtin_mul(lenv* e, lval* a) {
+    return builtin_op(e, a, "*");
+}
+
+lval* builtin_div(lenv* e, lval* a) {
+    return builtin_op(e, a, "/");
+}
+
+lval* builtin_head(lenv* e, lval* a) {
     LASSERT(a, a->count == 1,
         "Too many arguments to 'head'");
     LASSERT(a, a->cell[0]->type == LVAL_QEXPR,
@@ -112,8 +124,7 @@ lval* builtin_head(lval* a) {
     return v;
 }
 
-
-lval* builtin_tail(lval* a) {
+lval* builtin_tail(lenv* e, lval* a) {
     LASSERT(a, a->count == 1,
         "Too many argument to 'tail'");
     LASSERT(a, a->cell[0]->type == LVAL_QEXPR,
@@ -126,25 +137,22 @@ lval* builtin_tail(lval* a) {
     return v;
 }
 
-
-lval* builtin_list(lval* a) {
+lval* builtin_list(lenv* e, lval* a) {
     a->type = LVAL_QEXPR;
     return a;
 }
 
-
-lval* builtin_eval(lval* a) {
+lval* builtin_eval(lenv* e, lval* a) {
     LASSERT(a, a->count == 1,
         "Too many arguments to 'eval'");
     LASSERT(a, a->cell[0]->type == LVAL_QEXPR,
         "Only Qexpr can be passed to 'eval'");
     lval* x = lval_take(a, 0);
     x->type = LVAL_SEXPR;
-    return lval_eval(x);
+    return lval_eval(e, x);
 }
 
-
-lval* builtin_join(lval* a) {
+lval* builtin_join(lenv* e, lval* a) {
     for (int i = 0; i < a->count; i++) {
         LASSERT(a, a->cell[i]->type == LVAL_QEXPR,
             "Only Qexpr can be passed to 'join'");

@@ -26,6 +26,13 @@ lval* lval_sym(char* s) {
     return v;
 }
 
+lval* lval_fun(lbuiltin func) {
+    lval* v = malloc(sizeof(lval));
+    v->type = LVAL_FUN;
+    v->fun = func;
+    return v;
+}
+
 lval* lval_sexpr(void) {
     lval* v = malloc(sizeof(lval));
     v->type = LVAL_SEXPR;
@@ -51,6 +58,8 @@ void lval_del(lval* v) {
         // For Errors or Symbols free the string data
         case LVAL_ERR: free(v->err); break;
         case LVAL_SYM: free(v->sym); break;
+        // Don't do anything with function pointers
+        case LVAL_FUN: break;
         // Recursively free up Sexprs and Qexprs
         case LVAL_SEXPR:
         case LVAL_QEXPR:
@@ -136,6 +145,35 @@ lval* lval_join(lval* x, lval* y) {
 }
 
 
+lval* lval_copy(lval* v) {
+    lval* x = malloc(sizeof(lval));
+    x->type = v->type;
+
+    switch (v->type) {
+        // Copy Functions and numbers directly
+        case LVAL_FUN: x->fun = v->fun; break;
+        case LVAL_NUM: x->num = v->num; break;
+        // Copy strings with malloc and strcpy
+        case LVAL_ERR:
+            x->err = malloc(strlen(v->err) + 1);
+            strcpy(x->err, v->err); break;
+        case LVAL_SYM:
+            x->sym = malloc(strlen(v->sym) + 1);
+            strcpy(x->sym, v->sym); break;
+        // Copy lists by copying each sub-expression
+        case LVAL_SEXPR:
+        case LVAL_QEXPR:
+            x->count = v->count;
+            x->cell = malloc(sizeof(lval*) * x->count);
+            for (int i = 0; i < x->count; i++) {
+                x->cell[i] = lval_copy(v->cell[i]);
+            }
+            break;
+    }
+    return x;
+}
+
+
 void lval_expr_print(lval* v, char open, char close) {
     putchar(open);
     for (int i = 0; i < v->count; i++) {
@@ -155,6 +193,7 @@ void lval_print(lval* v) {
         case LVAL_NUM:   printf("%li", v->num); break;
         case LVAL_ERR:   printf("Error: %s", v->err); break;
         case LVAL_SYM:   printf("%s", v->sym); break;
+        case LVAL_FUN:   printf("<function>"); break;
         case LVAL_SEXPR: lval_expr_print(v, '(', ')'); break;
         case LVAL_QEXPR: lval_expr_print(v, '{', '}'); break;
     }
