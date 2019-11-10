@@ -113,8 +113,7 @@ lval* builtin_div(lenv* e, lval* a) {
 lval* builtin_head(lenv* e, lval* a) {
     LASSERT_ARG_COUNT(a, "head", 1);
     LASSERT_ARG_TYPE(a, "head", 0, a->cell[0], LVAL_QEXPR);
-    LASSERT(a, a->cell[0]->count != 0,
-        "Empty Q-Expr passed to 'head'");
+    LASSERT_NON_EMPTY_QEXPR(a, a->cell[0], "head");
     lval* v = lval_take(a, 0);
     // Delete everything but the head
     while (v->count > 1) { lval_del(lval_pop(v, 1)); }
@@ -124,8 +123,7 @@ lval* builtin_head(lenv* e, lval* a) {
 lval* builtin_tail(lenv* e, lval* a) {
     LASSERT_ARG_COUNT(a, "tail", 1);
     LASSERT_ARG_TYPE(a, "tail", 0, a->cell[0], LVAL_QEXPR);
-    LASSERT(a, a->cell[0]->count != 0,
-        "Empty Q-Expr passed to 'tail'");
+    LASSERT_NON_EMPTY_QEXPR(a, a->cell[0], "tail");
     lval* v = lval_take(a, 0);
     // Delete head
     lval_del(lval_pop(v, 0));

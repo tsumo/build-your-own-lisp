@@ -37,6 +37,12 @@ lval* builtin_op(lenv*, lval*, char*);
         return err; \
     }
 
+#define LASSERT_NON_EMPTY_QEXPR(cleanup, q, func) \
+    if (q->count == 0) { \
+        lval_del(cleanup); \
+        return lval_err("Function '%s' got empty Q-Expr", func); \
+    }
+
 lval* builtin_add(lenv*, lval*);
 lval* builtin_sub(lenv*, lval*);
 lval* builtin_mul(lenv*, lval*);
