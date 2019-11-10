@@ -20,6 +20,8 @@ typedef struct lval {
     char* sym;
     // Assigned function
     lbuiltin fun;
+    // Additional information
+    char* meta;
     // Count and pointer to a list of lval*
     int count;
     struct lval** cell;
@@ -32,7 +34,7 @@ enum { LVAL_ERR, LVAL_NUM,   LVAL_SYM,
 lval* lval_num(long);
 lval* lval_err(char*, ...);
 lval* lval_sym(char*);
-lval* lval_fun(lbuiltin);
+lval* lval_fun(lbuiltin, char*, ...);
 lval* lval_sexpr(void);
 lval* lval_qexpr(void);
 
