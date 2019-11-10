@@ -46,10 +46,12 @@ int main(int argc, char** argv) {
         // Parse input
         mpc_result_t r;
         if (mpc_parse("<stdin>", input, Lispy, &r)) {
+            // Print results of parsing
+            // mpc_ast_print(r.output);
+
             // Evaluate parse tree
             lval* x = lval_eval(e, lval_read(r.output));
             lval_println(x);
-            // mpc_ast_print(r.output);
             lval_del(x);
             mpc_ast_delete(r.output);
         } else {
