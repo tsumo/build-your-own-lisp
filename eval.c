@@ -111,10 +111,7 @@ lval* builtin_div(lenv* e, lval* a) {
 }
 
 lval* builtin_head(lenv* e, lval* a) {
-    LASSERT(a, a->count == 1,
-        "Too many arguments to 'head'. "
-        "Got %i, expected %i",
-        a->count, 1);
+    LASSERT_ARG_COUNT(a, "head", 1);
     LASSERT_ARG_TYPE(a, "head", 0, a->cell[0], LVAL_QEXPR);
     LASSERT(a, a->cell[0]->count != 0,
         "Empty Q-Expr passed to 'head'");
@@ -125,10 +122,7 @@ lval* builtin_head(lenv* e, lval* a) {
 }
 
 lval* builtin_tail(lenv* e, lval* a) {
-    LASSERT(a, a->count == 1,
-        "Too many argument to 'tail'. "
-        "Got %i, expected %i",
-        a->count, 1);
+    LASSERT_ARG_COUNT(a, "tail", 1);
     LASSERT_ARG_TYPE(a, "tail", 0, a->cell[0], LVAL_QEXPR);
     LASSERT(a, a->cell[0]->count != 0,
         "Empty Q-Expr passed to 'tail'");
@@ -144,10 +138,7 @@ lval* builtin_list(lenv* e, lval* a) {
 }
 
 lval* builtin_eval(lenv* e, lval* a) {
-    LASSERT(a, a->count == 1,
-        "Too many arguments to 'eval'. "
-        "Got %i, expected %i",
-        a->count, 1);
+    LASSERT_ARG_COUNT(a, "eval", 1);
     LASSERT_ARG_TYPE(a, "eval", 0, a->cell[0], LVAL_QEXPR);
     lval* x = lval_take(a, 0);
     x->type = LVAL_SEXPR;

@@ -28,6 +28,15 @@ lval* builtin_op(lenv*, lval*, char*);
         return err; \
     }
 
+#define LASSERT_ARG_COUNT(cleanup, func, c) \
+    if (cleanup->count != c) { \
+        lval* err = lval_err("Function '%s' got incorrect number " \
+            "of arguments. Got %i, expected %i", \
+            func, cleanup->count, c); \
+        lval_del(cleanup); \
+        return err; \
+    }
+
 lval* builtin_add(lenv*, lval*);
 lval* builtin_sub(lenv*, lval*);
 lval* builtin_mul(lenv*, lval*);
