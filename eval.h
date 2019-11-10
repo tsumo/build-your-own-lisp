@@ -19,6 +19,15 @@ lval* builtin_op(lenv*, lval*, char*);
         return err; \
     }
 
+#define LASSERT_ARG_TYPE(args, func, i, l, t) \
+    if (l->type != t) { \
+        lval* err = lval_err("Function '%s' got incorrect type " \
+            "of argument %i. Got %s, expected %s", \
+            func, i, ltype_name(l->type), ltype_name(t)); \
+        lval_del(args); \
+        return err; \
+    }
+
 lval* builtin_add(lenv*, lval*);
 lval* builtin_sub(lenv*, lval*);
 lval* builtin_mul(lenv*, lval*);
