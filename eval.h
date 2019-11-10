@@ -12,19 +12,19 @@ lval* lval_eval(lenv*, lval*);
 lval* builtin(lenv*, lval*, char*);
 lval* builtin_op(lenv*, lval*, char*);
 
-#define LASSERT(args, cond, fmt, ...) \
+#define LASSERT(cleanup, cond, fmt, ...) \
     if (!(cond)) { \
         lval* err = lval_err(fmt, ##__VA_ARGS__); \
-        lval_del(args); \
+        lval_del(cleanup); \
         return err; \
     }
 
-#define LASSERT_ARG_TYPE(args, func, i, l, t) \
+#define LASSERT_ARG_TYPE(cleanup, func, i, l, t) \
     if (l->type != t) { \
         lval* err = lval_err("Function '%s' got incorrect type " \
             "of argument %i. Got %s, expected %s", \
             func, i, ltype_name(l->type), ltype_name(t)); \
-        lval_del(args); \
+        lval_del(cleanup); \
         return err; \
     }
 
