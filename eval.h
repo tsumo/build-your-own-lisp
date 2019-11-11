@@ -10,7 +10,6 @@ lval* lval_eval_sexpr(lenv*, lval*);
 lval* lval_eval(lenv*, lval*);
 
 lval* builtin(lenv*, lval*, char*);
-lval* builtin_op(lenv*, lval*, char*);
 
 #define LASSERT(cleanup, cond, fmt, ...) \
     if (!(cond)) { \

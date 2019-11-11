@@ -45,23 +45,6 @@ lval* lval_eval(lenv* e, lval* v) {
 }
 
 
-lval* builtin(lenv* e, lval* a, char* func) {
-    if (strcmp("list", func) == 0) { return builtin_list(e, a); }
-    if (strcmp("head", func) == 0) { return builtin_head(e, a); }
-    if (strcmp("tail", func) == 0) { return builtin_tail(e, a); }
-    if (strcmp("join", func) == 0) { return builtin_join(e, a); }
-    if (strcmp("eval", func) == 0) { return builtin_eval(e, a); }
-    if (
-        strcmp("+", func)   == 0 || strcmp("-", func)   == 0 ||
-        strcmp("*", func)   == 0 || strcmp("/", func)   == 0
-    ) {
-        return builtin_op(e, a, func);
-    }
-    lval_del(a);
-    return lval_err("Unknown function '%s'", func);
-}
-
-
 lval* builtin_op(lenv* e, lval* a, char* op) {
     // Ensure all arguments are numbers
     for (int i = 0; i < a->count; i++) {
