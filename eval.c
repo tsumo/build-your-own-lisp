@@ -180,3 +180,14 @@ lval* builtin_join(lenv* e, lval* a) {
     return x;
 }
 
+lval* builtin_env(lenv* e, lval* a) {
+    LASSERT_ARG_COUNT(a, "env", 1);
+    LASSERT_ARG_TYPE(a, "env", 0, a->cell[0], LVAL_QEXPR);
+    LASSERT_EMPTY_QEXPR(a, a->cell[0], "env");
+    for (int i = 0; i< e->count; i++) {
+        printf("%-8s: ", e->syms[i]);
+        lval_println(e->vals[i]);
+    }
+    return lval_sexpr();
+}
+

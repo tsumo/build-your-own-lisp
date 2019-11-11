@@ -37,6 +37,12 @@ lval* builtin_op(lenv*, lval*, char*);
         return err; \
     }
 
+#define LASSERT_EMPTY_QEXPR(cleanup, q, func) \
+    if (q->count != 0) { \
+        lval_del(cleanup); \
+        return lval_err("Function '%s' got non-empty Q-Expr", func); \
+    }
+
 #define LASSERT_NON_EMPTY_QEXPR(cleanup, q, func) \
     if (q->count == 0) { \
         lval_del(cleanup); \
@@ -53,6 +59,7 @@ lval* builtin_list(lenv*, lval*);
 lval* builtin_eval(lenv*, lval*);
 lval* builtin_def(lenv*, lval*);
 lval* builtin_join(lenv*, lval*);
+lval* builtin_env(lenv*, lval*);
 
 #endif
 
