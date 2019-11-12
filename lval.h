@@ -11,18 +11,25 @@ typedef struct lenv lenv;
 // Function pointer to a builtin
 typedef lval*(*lbuiltin)(lenv*, lval*);
 
-// Result of evaluation
+// Value - result of reading input of doing computation
 typedef struct lval {
     int type;
+
+    // Basic properties
     long num;
     // Error and Symbol types have some string data
     char* err;
     char* sym;
-    // Assigned function
-    lbuiltin fun;
+
+    // Function properties
+    lbuiltin builtin;
+    lenv* env;
+    lval* formals;
+    lval* body;
     // Additional information
     char* meta;
-    // Count and pointer to a list of lval*
+
+    // Expression properties
     int count;
     struct lval** cell;
 } lval;

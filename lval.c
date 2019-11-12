@@ -38,7 +38,7 @@ lval* lval_sym(char* s) {
 lval* lval_fun(lbuiltin func, char* fmt, ...) {
     lval* v = malloc(sizeof(lval));
     v->type = LVAL_FUN;
-    v->fun = func;
+    v->builtin = func;
     // Store function description in lval metadata
     va_list va;
     va_start(va, fmt);
@@ -177,7 +177,7 @@ lval* lval_copy(lval* v) {
             strcpy(x->sym, v->sym); break;
         // Copy function and it's metadata
         case LVAL_FUN:
-            x->fun = v->fun;
+            x->builtin = v->builtin;
             x->meta = malloc(strlen(v->meta) + 1);
             strcpy(x->meta, v->meta); break;
         // Copy lists by copying each sub-expression

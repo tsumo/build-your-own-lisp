@@ -25,7 +25,7 @@ lval* lval_eval_sexpr(lenv* e, lval* v) {
         return err;
     }
     // Call function
-    lval* result = f->fun(e, v);
+    lval* result = f->builtin(e, v);
     lval_del(f);
     return result;
 }
