@@ -6,6 +6,7 @@
 
 lenv* lenv_new(void) {
     lenv* e = malloc(sizeof(lenv));
+    e->par = NULL;
     e->count = 0;
     e->syms = NULL;
     e->vals = NULL;
@@ -31,7 +32,12 @@ lval* lenv_get(lenv* e, lval* k) {
             return lval_copy(e->vals[i]);
         }
     }
-    return lval_err("Unbound symbol '%s'", k->sym);
+    // Search the parent environment
+    if (e->par) {
+        return lenv_get(e->par, k);
+    } else {
+        return lval_err("Unbound symbol '%s'", k->sym);
+    }
 }
 
 
@@ -56,9 +62,32 @@ void lenv_put(lenv* e, lval* k, lval* v) {
 }
 
 
+void lenv_def(lenv* e, lval* k, lval* v) {
+    // Iterate till e has no parent
+    while (e->par) { e = e->par; }
+    // Put value in outermost e
+    lenv_put(e, k, v);
+}
+
+
+lenv* lenv_copy(lenv* e) {
+    lenv* n = malloc(sizeof(lenv));
+    n->par = e->par;
+    n->count = e->count;
+    n->syms = malloc(sizeof(char*) * n->count);
+    n->vals = malloc(sizeof(lval*) * n->count);
+    for (int i = 0; i < e->count; i++) {
+        n->syms[i] = malloc(strlen(e->syms[i]) + 1);
+        strcpy(n->syms[i], e->syms[i]);
+        n->vals[i] = lval_copy(e->vals[i]);
+    }
+    return n;
+}
+
+
 void lenv_add_builtin(lenv* e, char* name, lbuiltin func) {
     lval* k = lval_sym(name);
-    lval* v = lval_fun(func, "builtin '%s'", name);
+    lval* v = lval_fun(func);
     lenv_put(e, k ,v);
     lval_del(k); lval_del(v);
 }
@@ -76,8 +105,10 @@ void lenv_add_builtins(lenv* e) {
     lenv_add_builtin(e, "tail", builtin_tail);
     lenv_add_builtin(e, "eval", builtin_eval);
     lenv_add_builtin(e, "join", builtin_join);
-    // Variable functions
+    // Symbol functions
     lenv_add_builtin(e, "def", builtin_def);
-    lenv_add_builtin(e, "env", builtin_env);
+    lenv_add_builtin(e, "=", builtin_put);
+    // Function functions?!
+    lenv_add_builtin(e, "\\", builtin_lambda);
 }
 

@@ -26,8 +26,6 @@ typedef struct lval {
     lenv* env;
     lval* formals;
     lval* body;
-    // Additional information
-    char* meta;
 
     // Expression properties
     int count;
@@ -41,9 +39,12 @@ enum { LVAL_ERR, LVAL_NUM,   LVAL_SYM,
 lval* lval_num(long);
 lval* lval_err(char*, ...);
 lval* lval_sym(char*);
-lval* lval_fun(lbuiltin, char*, ...);
+lval* lval_fun(lbuiltin);
+lval* lval_lambda(lval*, lval*);
 lval* lval_sexpr(void);
 lval* lval_qexpr(void);
+
+lval* lval_call(lenv*, lval*, lval*);
 
 void lval_del(lval*);
 

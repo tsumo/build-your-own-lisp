@@ -18,6 +18,7 @@ lval* builtin(lenv*, lval*, char*);
         return err; \
     }
 
+// TODO: no need not pass both i and l
 #define LASSERT_ARG_TYPE(cleanup, func, i, l, t) \
     if (l->type != t) { \
         lval* err = lval_err("Function '%s' got incorrect type " \
@@ -57,8 +58,10 @@ lval* builtin_tail(lenv*, lval*);
 lval* builtin_list(lenv*, lval*);
 lval* builtin_eval(lenv*, lval*);
 lval* builtin_def(lenv*, lval*);
+lval* builtin_put(lenv*, lval*);
+lval* builtin_var(lenv*, lval*, char*);
+lval* builtin_lambda(lenv*, lval*);
 lval* builtin_join(lenv*, lval*);
-lval* builtin_env(lenv*, lval*);
 
 #endif
 

@@ -25,7 +25,7 @@ lval* lval_eval_sexpr(lenv* e, lval* v) {
         return err;
     }
     // Call function
-    lval* result = f->builtin(e, v);
+    lval* result = lval_call(e, f, v);
     lval_del(f);
     return result;
 }
@@ -127,15 +127,25 @@ lval* builtin_eval(lenv* e, lval* a) {
 }
 
 lval* builtin_def(lenv* e, lval* a) {
-    LASSERT_ARG_TYPE(a, "def", 0, a->cell[0], LVAL_QEXPR);
+    return builtin_var(e, a, "def");
+}
+
+lval* builtin_put(lenv* e, lval* a) {
+    return builtin_var(e, a, "=");
+}
+
+lval* builtin_var(lenv* e, lval* a, char* func) {
+    LASSERT_ARG_TYPE(a, func, 0, a->cell[0], LVAL_QEXPR);
     // First argument is a symbol list
     lval* syms = a->cell[0];
     // Ensure that all elements of first list are symbols
     for (int i = 0; i < syms->count; i++) {
+        // TODO: abstract away in a macro
         LASSERT(a, syms->cell[i]->type == LVAL_SYM,
-            "Function 'def' got incorrect type in "
+            "Function '%s' got incorrect type in "
             "position %i of symbol list. Got %s, expected %s",
-            i, ltype_name(syms->cell[i]->type), ltype_name(LVAL_SYM));
+            func, i, ltype_name(syms->cell[i]->type),
+            ltype_name(LVAL_SYM));
     }
     // Check for correct number of symbols and values
     LASSERT(a, syms->count == a->count-1,
@@ -144,11 +154,36 @@ lval* builtin_def(lenv* e, lval* a) {
         syms->count, a->count-1);
     // Assign copies of values to symbols
     for (int i = 0; i< syms->count; i++) {
-        lenv_put(e, syms->cell[i], a->cell[i+1]);
+        // If 'def' define globally
+        if (strcmp(func, "def") == 0) {
+            lenv_def(e, syms->cell[i], a->cell[i+1]);
+        }
+        // If 'put' define locally
+        if (strcmp(func, "=") == 0) {
+            lenv_put(e, syms->cell[i], a->cell[i+1]);
+        }
     }
     lval_del(a);
     // Return empty expression on success
     return lval_sexpr();
+}
+
+lval* builtin_lambda(lenv* e, lval* a) {
+    LASSERT_ARG_COUNT(a, "\\", 2);
+    LASSERT_ARG_TYPE(a, "\\", 0, a->cell[0], LVAL_QEXPR);
+    LASSERT_ARG_TYPE(a, "\\", 1, a->cell[1], LVAL_QEXPR);
+    // Check that first Q-Expr contains only Symbols
+    for (int i = 0; i < a->cell[0]->count; i++) {
+        LASSERT(a, (a->cell[0]->cell[i]->type == LVAL_SYM),
+            "Function '\\' got incorrect type in "
+            "position %i of symbol list. Got %s, expected %s",
+            i, ltype_name(a->cell[0]->cell[i]->type),
+            ltype_name(LVAL_SYM));
+    }
+    lval* formals = lval_pop(a, 0);
+    lval* body = lval_pop(a, 0);
+    lval_del(a);
+    return lval_lambda(formals, body);
 }
 
 lval* builtin_join(lenv* e, lval* a) {
@@ -161,16 +196,5 @@ lval* builtin_join(lenv* e, lval* a) {
     }
     lval_del(a);
     return x;
-}
-
-lval* builtin_env(lenv* e, lval* a) {
-    LASSERT_ARG_COUNT(a, "env", 1);
-    LASSERT_ARG_TYPE(a, "env", 0, a->cell[0], LVAL_QEXPR);
-    LASSERT_EMPTY_QEXPR(a, a->cell[0], "env");
-    for (int i = 0; i< e->count; i++) {
-        printf("%-8s: ", e->syms[i]);
-        lval_println(e->vals[i]);
-    }
-    return lval_sexpr();
 }
 

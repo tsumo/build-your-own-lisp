@@ -10,6 +10,8 @@ typedef lval* (*lbuiltin)(lenv*, lval*);
 
 
 typedef struct lenv {
+    // Parent environment
+    lenv* par;
     int count;
     char** syms;
     lval** vals;
@@ -21,6 +23,9 @@ void lenv_del(lenv*);
 
 lval* lenv_get(lenv*, lval*);
 void lenv_put(lenv*, lval*, lval*);
+void lenv_def(lenv*, lval*, lval*);
+
+lenv* lenv_copy(lenv*);
 
 void lenv_add_builtin(lenv*, char*, lbuiltin);
 void lenv_add_builtins(lenv*);
