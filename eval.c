@@ -140,12 +140,7 @@ lval* builtin_var(lenv* e, lval* a, char* func) {
     lval* syms = a->cell[0];
     // Ensure that all elements of first list are symbols
     for (int i = 0; i < syms->count; i++) {
-        // TODO: abstract away in a macro
-        LASSERT(a, syms->cell[i]->type == LVAL_SYM,
-            "Function '%s' got incorrect type in "
-            "position %i of symbol list. Got %s, expected %s",
-            func, i, ltype_name(syms->cell[i]->type),
-            ltype_name(LVAL_SYM));
+        LASSERT_SYM_LIST(a, func, i, syms)
     }
     // Check for correct number of symbols and values
     LASSERT(a, syms->count == a->count-1,
@@ -174,11 +169,7 @@ lval* builtin_lambda(lenv* e, lval* a) {
     LASSERT_ARG_TYPE(a, "\\", 1, a->cell[1], LVAL_QEXPR);
     // Check that first Q-Expr contains only Symbols
     for (int i = 0; i < a->cell[0]->count; i++) {
-        LASSERT(a, (a->cell[0]->cell[i]->type == LVAL_SYM),
-            "Function '\\' got incorrect type in "
-            "position %i of symbol list. Got %s, expected %s",
-            i, ltype_name(a->cell[0]->cell[i]->type),
-            ltype_name(LVAL_SYM));
+        LASSERT_SYM_LIST(a, "\\", i, a->cell[0])
     }
     lval* formals = lval_pop(a, 0);
     lval* body = lval_pop(a, 0);

@@ -28,6 +28,16 @@ lval* builtin(lenv*, lval*, char*);
         return err; \
     }
 
+#define LASSERT_SYM_LIST(cleanup, func, i, l) \
+    if (l->cell[i]->type != LVAL_SYM) { \
+        lval* err = lval_err("Function '%s' got incorrect type in " \
+            "position %i of symbol list. Got %s, expected %s", \
+            func, i, ltype_name(l->cell[i]->type), \
+            ltype_name(LVAL_SYM)); \
+        lval_del(cleanup); \
+        return err; \
+    }
+
 #define LASSERT_ARG_COUNT(cleanup, func, c) \
     if (cleanup->count != c) { \
         lval* err = lval_err("Function '%s' got incorrect number " \
