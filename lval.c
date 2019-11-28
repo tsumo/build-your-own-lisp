@@ -91,12 +91,44 @@ lval* lval_call(lenv* e, lval* f, lval* a) {
                 given, total);
         }
         lval* sym = lval_pop(f->formals, 0);
+        // Special case for variable number of arguments
+        if (strcmp(sym->sym, "&") == 0) {
+            // Make sure that '&' is followed by another symbol
+            // TODO: try to rewrite as ASSERT
+            if (f->formals->count != 1) {
+                lval_del(a);
+                return lval_err("Function format invalid. "
+                    "Symbol '&' not followed by single symbol");
+            }
+            // Bind remaining arguments to the last formal
+            lval* nsym = lval_pop(f->formals, 0);
+            lenv_put(f->env, nsym, builtin_list(e, a));
+            lval_del(sym); lval_del(nsym);
+            break;
+        }
         lval* val = lval_pop(a, 0);
         // Bind a copy of value into function environment
         lenv_put(f->env, sym, val);
         lval_del(sym); lval_del(val);
     }
+    // Argument list is now bound and can be cleaned up
     lval_del(a);
+    // If '&' remains in the formal list - bind it to empty list
+    if (f->formals->count > 0 &&
+        strcmp(f->formals->cell[0]->sym, "&") == 0) {
+        if (f->formals->count != 2) {
+            return lval_err("Function format invalid. "
+                "Symbol '&' not followed by single symbol.");
+        }
+        // Pop and delete the '&' symbol
+        lval_del(lval_pop(f->formals, 0));
+        // Pop last symbol and create empty list
+        lval* sym = lval_pop(f->formals, 0);
+        lval* val = lval_qexpr();
+        // Bind to environment and delete
+        lenv_put(f->env, sym, val);
+        lval_del(sym); lval_del(val);
+    }
     // Evaluate if all formals are bound
     if (f->formals->count == 0) {
         // Set parent environment
