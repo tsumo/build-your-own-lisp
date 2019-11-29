@@ -244,3 +244,23 @@ lval* builtin_cmp(lenv* e, lval* a, char* op) {
     return lval_num(r);
 }
 
+lval* builtin_if(lenv* e, lval* a) {
+    LASSERT_ARG_COUNT(a, "if", 3);
+    LASSERT_ARG_TYPE(a, "if", 0, a->cell[0], LVAL_NUM);
+    LASSERT_ARG_TYPE(a, "if", 1, a->cell[1], LVAL_QEXPR);
+    LASSERT_ARG_TYPE(a, "if", 2, a->cell[2], LVAL_QEXPR);
+    lval* x;
+    // Mark both expressions as evaluable
+    a->cell[1]->type = LVAL_SEXPR;
+    a->cell[2]->type = LVAL_SEXPR;
+    // If condition is true evaluate first expression,
+    // otherwise evaluate second
+    if (a->cell[0]->num) {
+        x = lval_eval(e, lval_pop(a, 1));
+    } else {
+        x = lval_eval(e, lval_pop(a, 2));
+    }
+    lval_del(a);
+    return x;
+}
+

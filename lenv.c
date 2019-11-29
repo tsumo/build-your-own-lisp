@@ -117,5 +117,7 @@ void lenv_add_builtins(lenv* e) {
     lenv_add_builtin(e, "<=", builtin_le);
     lenv_add_builtin(e, "==", builtin_eq);
     lenv_add_builtin(e, "!=", builtin_ne);
+    // Control flow
+    lenv_add_builtin(e, "if", builtin_if);
 }
 

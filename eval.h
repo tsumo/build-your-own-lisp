@@ -80,6 +80,7 @@ lval* builtin_ord(lenv*, lval*, char*);
 lval* builtin_eq(lenv*, lval*);
 lval* builtin_ne(lenv*, lval*);
 lval* builtin_cmp(lenv*, lval*, char*);
+lval* builtin_if(lenv*, lval*);
 
 #endif
 
