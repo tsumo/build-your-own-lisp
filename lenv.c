@@ -110,5 +110,10 @@ void lenv_add_builtins(lenv* e) {
     lenv_add_builtin(e, "=", builtin_put);
     // Function functions?!
     lenv_add_builtin(e, "\\", builtin_lambda);
+    // Comparison functions
+    lenv_add_builtin(e, ">", builtin_gt);
+    lenv_add_builtin(e, "<", builtin_lt);
+    lenv_add_builtin(e, ">=", builtin_ge);
+    lenv_add_builtin(e, "<=", builtin_le);
 }
 

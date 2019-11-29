@@ -72,6 +72,11 @@ lval* builtin_put(lenv*, lval*);
 lval* builtin_var(lenv*, lval*, char*);
 lval* builtin_lambda(lenv*, lval*);
 lval* builtin_join(lenv*, lval*);
+lval* builtin_gt(lenv*, lval*);
+lval* builtin_lt(lenv*, lval*);
+lval* builtin_ge(lenv*, lval*);
+lval* builtin_le(lenv*, lval*);
+lval* builtin_ord(lenv*, lval*, char*);
 
 #endif
 
