@@ -77,6 +77,9 @@ lval* builtin_lt(lenv*, lval*);
 lval* builtin_ge(lenv*, lval*);
 lval* builtin_le(lenv*, lval*);
 lval* builtin_ord(lenv*, lval*, char*);
+lval* builtin_eq(lenv*, lval*);
+lval* builtin_ne(lenv*, lval*);
+lval* builtin_cmp(lenv*, lval*, char*);
 
 #endif
 

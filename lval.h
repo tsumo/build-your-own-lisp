@@ -60,6 +60,8 @@ lval* lval_join(lval*, lval*);
 
 lval* lval_copy(lval*);
 
+int lval_eq(lval*, lval*);
+
 void lval_expr_print(lval*, char, char);
 void lval_print(lval*);
 void lval_println(lval*);

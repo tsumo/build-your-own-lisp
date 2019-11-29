@@ -282,6 +282,38 @@ lval* lval_copy(lval* v) {
 }
 
 
+int lval_eq(lval* x, lval* y) {
+    // Different types are always unequal
+    if (x->type != y->type) { return 0; }
+    switch (x->type) {
+        // Compare numbers
+        case LVAL_NUM: return (x->num == y->num);
+        // Compare strings
+        case LVAL_ERR: return (strcmp(x->err, y->err) == 0);
+        case LVAL_SYM: return (strcmp(x->sym, y->sym) == 0);
+        // Compare builtins directly
+        // Compare formals and body for user-defined functions
+        case LVAL_FUN:
+           if (x->builtin || y->builtin) {
+               return x->builtin == y->builtin;
+           } else {
+               return lval_eq(x->formals, y->formals)
+                   && lval_eq(x->body, y->body);
+           }
+        // Compare every element of the list
+        case LVAL_QEXPR:
+        case LVAL_SEXPR:
+           if (x->count != y->count) { return 0; };
+           for (int i = 0; i < x->count; i++) {
+               if (!lval_eq(x->cell[i], y->cell[i])) { return 0; }
+           }
+           return 1;
+        break;
+    }
+    return 0;
+}
+
+
 void lval_expr_print(lval* v, char open, char close) {
     putchar(open);
     for (int i = 0; i < v->count; i++) {
