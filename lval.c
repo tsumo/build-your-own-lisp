@@ -37,6 +37,14 @@ lval* lval_sym(char* s) {
     return v;
 }
 
+lval* lval_str(char* s) {
+    lval* v = malloc(sizeof(lval));
+    v->type = LVAL_STR;
+    v->str = malloc(strlen(s) + 1);
+    strcpy(v->str, s);
+    return v;
+}
+
 lval* lval_fun(lbuiltin func) {
     lval* v = malloc(sizeof(lval));
     v->type = LVAL_FUN;
@@ -146,9 +154,10 @@ void lval_del(lval* v) {
     switch (v->type) {
         // Do nothing special for number type
         case LVAL_NUM: break;
-        // For Errors or Symbols free the string data
+        // Free string data
         case LVAL_ERR: free(v->err); break;
         case LVAL_SYM: free(v->sym); break;
+        case LVAL_STR: free(v->str); break;
         case LVAL_FUN:
             // Free user-defined function data
             if (!v->builtin) {
@@ -182,10 +191,27 @@ lval* lval_read_num(mpc_ast_t* t) {
 }
 
 
+lval* lval_read_str(mpc_ast_t* t) {
+    // Cut off final quote character
+    t->contents[strlen(t->contents)-1] = '\0';
+    // Copy the string ommiting the first quote character
+    char* unescaped = malloc(strlen(t->contents+1)+1);
+    strcpy(unescaped, t->contents+1);
+    // Pass through the unescape function
+    unescaped = mpcf_unescape(unescaped);
+    // Construct a new lval using the string
+    lval* str = lval_str(unescaped);
+    // Free the string
+    free(unescaped);
+    return str;
+}
+
+
 lval* lval_read(mpc_ast_t* t) {
     // For Symbol or Number return conversion to that type
     if (strstr(t->tag, "number")) { return lval_read_num(t); }
     if (strstr(t->tag, "symbol")) { return lval_sym(t->contents); }
+    if (strstr(t->tag, "string")) { return lval_read_str(t); }
     // For root (>) or Sexpr create empty list
     lval* x = NULL;
     if (strcmp(t->tag, ">") == 0) { x = lval_sexpr(); }
@@ -257,6 +283,9 @@ lval* lval_copy(lval* v) {
         case LVAL_SYM:
             x->sym = malloc(strlen(v->sym) + 1);
             strcpy(x->sym, v->sym); break;
+        case LVAL_STR:
+            x->str = malloc(strlen(v->str) + 1);
+            strcpy(x->str, v->str); break;
         // Copy function
         case LVAL_FUN:
             if (v->builtin) {
@@ -291,6 +320,7 @@ int lval_eq(lval* x, lval* y) {
         // Compare strings
         case LVAL_ERR: return (strcmp(x->err, y->err) == 0);
         case LVAL_SYM: return (strcmp(x->sym, y->sym) == 0);
+        case LVAL_STR: return (strcmp(x->str, y->str) == 0);
         // Compare builtins directly
         // Compare formals and body for user-defined functions
         case LVAL_FUN:
@@ -333,6 +363,7 @@ void lval_print(lval* v) {
         case LVAL_NUM:   printf("%li", v->num); break;
         case LVAL_ERR:   printf("Error: %s", v->err); break;
         case LVAL_SYM:   printf("%s", v->sym); break;
+        case LVAL_STR:   lval_print_str(v); break;
         case LVAL_FUN:
             if (v->builtin) {
                 printf("<builtin>");
@@ -350,11 +381,25 @@ void lval_print(lval* v) {
 void lval_println(lval* v) { lval_print(v); putchar('\n'); }
 
 
+void lval_print_str(lval* v) {
+    // Make a copy of the string
+    char* escaped = malloc(strlen(v->str)+1);
+    strcpy(escaped, v->str);
+    // Pass it through the escape function
+    escaped = mpcf_escape(escaped);
+    // Print it between quote characters
+    printf("\"%s\"", escaped);
+    // Free the copied string
+    free(escaped);
+}
+
+
 char* ltype_name(int t) {
     switch(t) {
         case LVAL_ERR: return "Error";
         case LVAL_NUM: return "Number";
         case LVAL_SYM: return "Symbol";
+        case LVAL_STR: return "String";
         case LVAL_FUN: return "Function";
         case LVAL_SEXPR: return "S-Expr";
         case LVAL_QEXPR: return "Q-Expr";

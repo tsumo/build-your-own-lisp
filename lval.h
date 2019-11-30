@@ -17,9 +17,9 @@ typedef struct lval {
 
     // Basic properties
     long num;
-    // Error and Symbol types have some string data
     char* err;
     char* sym;
+    char* str;
 
     // Function properties
     lbuiltin builtin;
@@ -33,12 +33,13 @@ typedef struct lval {
 } lval;
 
 // lval types
-enum { LVAL_ERR, LVAL_NUM,   LVAL_SYM,
+enum { LVAL_ERR, LVAL_NUM,   LVAL_SYM, LVAL_STR,
        LVAL_FUN, LVAL_SEXPR, LVAL_QEXPR };
 
 lval* lval_num(long);
 lval* lval_err(char*, ...);
 lval* lval_sym(char*);
+lval* lval_str(char*);
 lval* lval_fun(lbuiltin);
 lval* lval_lambda(lval*, lval*);
 lval* lval_sexpr(void);
@@ -49,6 +50,7 @@ lval* lval_call(lenv*, lval*, lval*);
 void lval_del(lval*);
 
 lval* lval_read_num(mpc_ast_t*);
+lval* lval_read_str(mpc_ast_t*);
 lval* lval_read(mpc_ast_t*);
 
 lval* lval_add(lval*, lval*);
@@ -65,6 +67,7 @@ int lval_eq(lval*, lval*);
 void lval_expr_print(lval*, char, char);
 void lval_print(lval*);
 void lval_println(lval*);
+void lval_print_str(lval*);
 
 char* ltype_name(int);
 
