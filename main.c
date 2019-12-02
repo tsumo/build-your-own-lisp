@@ -4,6 +4,7 @@
 #include "lenv.h"
 #include "lval.h"
 #include "eval.h"
+#include "main.h"
 
 #include <editline/readline.h>
 // #include <editline/histedit.h>

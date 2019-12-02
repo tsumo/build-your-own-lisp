@@ -119,5 +119,7 @@ void lenv_add_builtins(lenv* e) {
     lenv_add_builtin(e, "!=", builtin_ne);
     // Control flow
     lenv_add_builtin(e, "if", builtin_if);
+    // Filesystem
+    lenv_add_builtin(e, "load", builtin_load);
 }
 

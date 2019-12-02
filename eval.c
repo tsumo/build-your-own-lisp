@@ -2,6 +2,7 @@
 #include "lval.h"
 #include "lenv.h"
 #include "eval.h"
+#include "main.h"
 
 lval* lval_eval_sexpr(lenv* e, lval* v) {
     // Evaluate children
@@ -262,5 +263,38 @@ lval* builtin_if(lenv* e, lval* a) {
     }
     lval_del(a);
     return x;
+}
+
+lval* builtin_load(lenv* e, lval* a) {
+    LASSERT_ARG_COUNT(a, "load", 1);
+    LASSERT_ARG_TYPE(a, "load", 0, a->cell[0], LVAL_STR);
+    // Parse file given by string path
+    mpc_result_t r;
+    if (mpc_parse_contents(a->cell[0]->str, Lispy, &r)) {
+        // Read contents
+        lval* expr = lval_read(r.output);
+        mpc_ast_delete(r.output);
+        // Evaluate each expression
+        while (expr->count) {
+            lval* x = lval_eval(e, lval_pop(expr, 0));
+            // If evaluation leads to error - print it
+            if (x->type == LVAL_ERR) { lval_println(x); }
+            lval_del(x);
+        }
+        // Delete expressions and arguments
+        lval_del(expr);
+        lval_del(a);
+        // Return empty list
+        return lval_sexpr();
+    } else {
+        // Get parse error as string
+        char* err_msg = mpc_err_string(r.error);
+        mpc_err_delete(r.error);
+        // Create new error value using it
+        lval* err = lval_err(err_msg);
+        free(err_msg);
+        lval_del(a);
+        return err;
+    }
 }
 
