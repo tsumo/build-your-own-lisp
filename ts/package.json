@@ -1,0 +1,16 @@
+{
+  "name": "lispy",
+  "version": "1.0.0",
+  "repository": "https://github.com/tsumo/build-your-own-lisp",
+  "author": "tsumo",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "dev": "parcel index.html",
+    "build": "parcel build index.html"
+  },
+  "devDependencies": {
+    "parcel-bundler": "^1.12.4",
+    "typescript": "^4.0.2"
+  }
+}

@@ -1,3 +1,7 @@
 /.vscode
 
 /c/bin/
+
+/ts/node_modules
+/ts/.cache
+/ts/dist
