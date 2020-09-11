@@ -7,5 +7,7 @@ http://www.buildyourownlisp.com
 ## C version
 
 On Ubuntu you may need these packages: `libreadline-dev`, `libeditline-dev`, `libedit-dev`.
+
 Tweak readline/editline includes in main.c for you OS.
+
 Build binary with the `./build.sh main.c`.
