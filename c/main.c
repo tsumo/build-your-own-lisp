@@ -5,8 +5,12 @@
 #include "lval.h"
 #include "eval.h"
 
-#include <editline/readline.h>
-// #include <editline/histedit.h>
+// Arch libs
+// #include <editline/readline.h>
+
+// Ubuntu libs
+#include <readline/readline.h>
+#include <editline.h>
 
 
 int main(int argc, char** argv) {
