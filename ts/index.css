@@ -1,0 +1,30 @@
+body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+#output,
+#input {
+  width: 100%;
+  max-width: 500px;
+  font-size: 18px;
+  font-family: monospace;
+  padding: 16px;
+  box-sizing: border-box;
+  border: 1px solid #999;
+  margin: 8px;
+}
+
+#output {
+  color: #999;
+  flex: 1;
+  overflow: auto;
+}
+
+#input {
+  color: #666;
+  resize: none;
+}
