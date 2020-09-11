@@ -8,9 +8,18 @@ const addInputListener = (
 
   const keyDownListener = (e: KeyboardEvent) => {
     if (e.code === "ArrowUp" && inputEl.selectionStart === 0) {
+      e.preventDefault();
       inputEl.value = lastCommand;
+      return;
     }
-    if (e.ctrlKey && e.code === "Enter") {
+
+    if (e.code === "Enter" && e.ctrlKey) {
+      e.preventDefault();
+      inputEl.value += "\n";
+      return;
+    }
+
+    if (e.code === "Enter") {
       e.preventDefault();
       if (inputEl.value.trim().length === 0) {
         return;
@@ -20,6 +29,7 @@ const addInputListener = (
       outputEl.scrollTo({ top: outputEl.scrollHeight });
       lastCommand = trimmedValue;
       inputEl.value = "";
+      return;
     }
   };
   inputEl.addEventListener("keydown", keyDownListener);
