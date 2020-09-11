@@ -2,7 +2,12 @@ const addInputListener = (
   inputEl: HTMLTextAreaElement,
   outputEl: HTMLDivElement
 ) => {
+  let lastCommand = "";
+
   const keyDownListener = (e: KeyboardEvent) => {
+    if (e.code === "ArrowUp" && inputEl.selectionStart === 0) {
+      inputEl.value = lastCommand;
+    }
     if (e.ctrlKey && e.code === "Enter") {
       e.preventDefault();
       if (inputEl.value.trim().length === 0) {
@@ -10,6 +15,7 @@ const addInputListener = (
       }
       outputEl.innerHTML += `${inputEl.value.trim()}<br />`;
       outputEl.scrollTo({ top: outputEl.scrollHeight });
+      lastCommand = inputEl.value.trim();
       inputEl.value = "";
     }
   };
