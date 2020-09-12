@@ -1,4 +1,4 @@
-import { parse } from "./parser";
+import { parse } from "./parser/index";
 
 const addInputListener = (
   inputEl: HTMLTextAreaElement,
