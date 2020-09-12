@@ -1,4 +1,4 @@
-import { parseInterger } from "./parser";
+import { parse } from "./parser";
 
 const addInputListener = (
   inputEl: HTMLTextAreaElement,
@@ -25,7 +25,7 @@ const addInputListener = (
         return;
       }
       const trimmedValue = inputEl.value.trim();
-      outputEl.innerHTML += `${parseInterger(trimmedValue)}<br />`;
+      outputEl.innerHTML += `${parse(trimmedValue)}<br />`;
       outputEl.scrollTo({ top: outputEl.scrollHeight });
       lastCommand = trimmedValue;
       inputEl.value = "";
