@@ -1,5 +1,5 @@
 import { sequenceParsers } from "./parser-combinators";
-import { parseOperation, parseInteger, parseEof } from "./parsers";
+import { parseOperation, parseNumber, parseEof } from "./parsers";
 import { ParseResult } from "./types";
 
 const reportResult = (result: ParseResult<any>): string => {
@@ -26,9 +26,9 @@ const handleParsed = <T extends ParsedData>(...args: T) => {
 export const parse = (input: string) =>
   reportResult(
     sequenceParsers<ParsedData, number>(handleParsed, [
-      parseInteger,
+      parseNumber,
       parseOperation,
-      parseInteger,
+      parseNumber,
       parseEof,
     ])(input)
   );

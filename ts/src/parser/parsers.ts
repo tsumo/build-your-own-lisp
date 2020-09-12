@@ -7,9 +7,9 @@ import {
 } from "./parser-creators";
 import { Parser } from "./types";
 
-export const parseInteger = mapParserResult(
+export const parseNumber = mapParserResult(
   (x) => +x,
-  createRegexParser(/\d+/)
+  createRegexParser(/\d+(?:\.\d+)?/)
 );
 
 const operationHandlers = {
