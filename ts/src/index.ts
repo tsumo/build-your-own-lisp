@@ -25,7 +25,7 @@ const addInputListener = (
         return;
       }
       const trimmedValue = inputEl.value.trim();
-      outputEl.innerHTML += `${parse(trimmedValue)}<br />`;
+      outputEl.innerHTML += `<p class="line">${parse(trimmedValue)}<p />`;
       outputEl.scrollTo({ top: outputEl.scrollHeight });
       lastCommand = trimmedValue;
       inputEl.value = "";

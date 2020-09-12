@@ -28,3 +28,7 @@ body {
   color: #666;
   resize: none;
 }
+
+.line {
+  margin: 8px 0;
+}
