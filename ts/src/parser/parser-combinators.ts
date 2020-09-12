@@ -1,4 +1,4 @@
-import { success } from "./parse-result-creators";
+import { success, failure } from "./parse-result-creators";
 import { Parser, ParseResult } from "./types";
 
 /** Generalized tuple */
@@ -31,4 +31,19 @@ export const sequenceParsers = <T extends Arr, R>(
   }
 
   return success(handleParsed(...parsedData), currentInput);
+};
+
+/** Uses indexed access type */
+export const oneOfParsers = <T extends Arr>(...parsers: [...Parsers<T>]) => (
+  input: string
+): ParseResult<T[number]> => {
+  for (const parser of parsers) {
+    const result = parser(input);
+    if (result.kind === "failure") {
+      continue;
+    }
+    // Again, not sure how to enforce type safety here
+    return result as ParseResult<T[number]>;
+  }
+  return failure("oneOf", input);
 };

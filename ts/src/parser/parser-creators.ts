@@ -1,9 +1,9 @@
 import { success, failure } from "./parse-result-creators";
 import { Parser } from "./types";
 
-export const mapParserResult = <T>(
-  map: (result: string) => T,
-  parser: Parser<string>
+export const mapParserResult = <T, R>(
+  map: (result: T) => R,
+  parser: Parser<T>
 ) => (input: string) => {
   const result = parser(input);
   if (result.kind === "failure") {
@@ -12,7 +12,7 @@ export const mapParserResult = <T>(
   return success(map(result.data), result.rest);
 };
 
-export const createTextParser = (match: string): Parser<string> => (
+export const createTextParser = <T extends string>(match: T): Parser<T> => (
   input: string
 ) => {
   if (input.startsWith(match)) {

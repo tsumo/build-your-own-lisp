@@ -1,5 +1,5 @@
 import { sequenceParsers } from "./parser-combinators";
-import { parsePlus, parseInteger, parseEof } from "./parsers";
+import { parseOperation, parseInteger, parseEof } from "./parsers";
 import { ParseResult } from "./types";
 
 const reportResult = (result: ParseResult<any>): string => {
@@ -10,19 +10,24 @@ const reportResult = (result: ParseResult<any>): string => {
   }
 };
 
-type ParsedData = [number, string, number, null];
+type ParsedData = [
+  number,
+  (num1: number, num2: number) => number,
+  number,
+  null
+];
 
 const handleParsed = <T extends ParsedData>(...args: T) => {
-  const [num1, _, num2] = args;
-  return num1 + num2;
+  const [num1, operationHandler, num2] = args;
+  return operationHandler(num1, num2);
 };
 
-/** Parses expressions of shape "int+int" into a resulting number */
+/** Parses expressions of shape "<int><op><int>" into a resulting number */
 export const parse = (input: string) =>
   reportResult(
     sequenceParsers<ParsedData, number>(handleParsed, [
       parseInteger,
-      parsePlus,
+      parseOperation,
       parseInteger,
       parseEof,
     ])(input)
