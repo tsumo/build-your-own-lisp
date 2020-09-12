@@ -1,6 +1,5 @@
 import { success } from "./parse-result-creators";
-import { reportSuccess, reportFailure } from "./reporters";
-import { Parser } from "./types";
+import { Parser, ParseResult } from "./types";
 
 /** Generalized tuple */
 type Arr = readonly unknown[];
@@ -16,7 +15,7 @@ type ResultHandler<T extends Arr, R> = (...args: [...T]) => R;
 export const sequenceParsers = <T extends Arr, R>(
   handleParsed: ResultHandler<T, R>,
   parsers: Parsers<T>
-) => (input: string) => {
+) => (input: string): ParseResult<R> => {
   // I don't know how to express partial variadic tuple
   // Probably have to write custom "push" function
   const parsedData: [...T] = ([] as unknown) as [...T];
@@ -25,11 +24,11 @@ export const sequenceParsers = <T extends Arr, R>(
   for (const parser of parsers) {
     const result = parser(currentInput);
     if (result.kind === "failure") {
-      return reportFailure(result);
+      return result;
     }
     parsedData.push(result.data);
     currentInput = result.rest;
   }
 
-  return reportSuccess(success(handleParsed(...parsedData), currentInput));
+  return success(handleParsed(...parsedData), currentInput);
 };
