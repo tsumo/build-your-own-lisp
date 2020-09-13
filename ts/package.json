@@ -7,10 +7,17 @@
   "private": true,
   "scripts": {
     "dev": "parcel index.html",
-    "build": "parcel build index.html"
+    "build": "parcel build index.html",
+    "lint": "eslint ./src --ext .js,.ts, --quiet --fix"
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^4.1.0",
+    "@typescript-eslint/parser": "^4.1.0",
+    "eslint": "^7.9.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.4",
     "parcel-bundler": "^1.12.4",
+    "prettier": "^2.1.1",
     "typescript": "^4.0.2"
   }
 }
