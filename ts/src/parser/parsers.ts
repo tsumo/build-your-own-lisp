@@ -14,24 +14,24 @@ export const parseToken = createLexemeParser(parseSpaces)
 
 export const parseNumber = mapParserResult((x) => +x, createRegexParser(/\d+(?:\.\d+)?/))
 
-const binaryOperationHandlers = {
-  '+': (num1: number, num2: number) => num1 + num2,
-  '-': (num1: number, num2: number) => num1 - num2,
-  '*': (num1: number, num2: number) => num1 * num2,
-  '/': (num1: number, num2: number) => num1 / num2,
-  '^': (num1: number, num2: number) => num1 ** num2,
+const oneOfOperations = oneOfParsers(
+  createTextParser('+'),
+  createTextParser('-'),
+  createTextParser('*'),
+  createTextParser('/'),
+  createTextParser('^'),
+)
+
+const operationHandlers = {
+  '+': (...nums: number[]) => nums.reduce((prev, curr) => prev + curr),
+  '-': (...nums: number[]) => nums.reduce((prev, curr) => prev - curr),
+  '*': (...nums: number[]) => nums.reduce((prev, curr) => prev * curr),
+  '/': (...nums: number[]) => nums.reduce((prev, curr) => prev / curr),
+  '^': (...nums: number[]) => nums.reduce((prev, curr) => prev ** curr),
 }
 
-export const parseBinaryOperation = (input: string) => {
-  const oneOf = oneOfParsers(
-    createTextParser('+'),
-    createTextParser('-'),
-    createTextParser('*'),
-    createTextParser('/'),
-    createTextParser('^'),
-  )
-  return mapParserResult((op) => binaryOperationHandlers[op], oneOf)(input)
-}
+export const parseOperation = (input: string) =>
+  mapParserResult((op) => operationHandlers[op], oneOfOperations)(input)
 
 export const parseEof: Parser<null> = (input: string) => {
   if (input.length === 0) {

@@ -1,12 +1,6 @@
 import { oneOfParsers, sequenceParsers } from './../parser/parser-combinators'
 import { createTextParser, labelParser } from './../parser/parser-creators'
-import {
-  parseEof,
-  parseNumber,
-  parseBinaryOperation,
-  parseSpaces,
-  parseToken,
-} from './../parser/parsers'
+import { parseEof, parseNumber, parseOperation, parseSpaces, parseToken } from './../parser/parsers'
 import { ParseResult } from './../parser/types'
 
 const reportResult = (result: ParseResult<any>): string => {
@@ -27,7 +21,7 @@ const parseApplication = sequenceParsers<
 >((spaces, open, op, num1, num2) => op(num1, num2), [
   parseSpaces,
   parseToken(parseOpenParen),
-  parseToken(labelParser(parseBinaryOperation, 'an arithmetic operation')),
+  parseToken(labelParser(parseOperation, 'an arithmetic operation')),
   parseToken(parseNumber),
   parseToken(parseNumber),
   parseToken(parseCloseParen),
