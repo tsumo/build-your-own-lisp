@@ -1,4 +1,4 @@
-import { parse } from './parser/index'
+import { parse } from './grammars/arithmetic'
 
 const addInputListener = (inputEl: HTMLTextAreaElement, outputEl: HTMLDivElement) => {
   let lastCommand = ''

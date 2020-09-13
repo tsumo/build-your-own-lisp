@@ -1,7 +1,7 @@
-import { sequenceParsers } from './parser-combinators'
-import { labelParser } from './parser-creators'
-import { parseOperation, parseNumber, parseEof, parseSpaces, parseToken } from './parsers'
-import { ParseResult } from './types'
+import { sequenceParsers } from './../parser/parser-combinators'
+import { labelParser } from './../parser/parser-creators'
+import { parseOperation, parseNumber, parseEof, parseSpaces, parseToken } from './../parser/parsers'
+import { ParseResult } from './../parser/types'
 
 const reportResult = (result: ParseResult<any>): string => {
   if (result.kind === 'failure') {
