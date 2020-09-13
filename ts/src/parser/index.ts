@@ -1,4 +1,5 @@
 import { sequenceParsers } from './parser-combinators'
+import { labelParser } from './parser-creators'
 import { parseOperation, parseNumber, parseEof } from './parsers'
 import { ParseResult } from './types'
 
@@ -22,7 +23,7 @@ export const parse = (input: string) =>
   reportResult(
     sequenceParsers<ParsedData, number>(handleParsed, [
       parseNumber,
-      parseOperation,
+      labelParser(parseOperation, 'an arithmetic operator'),
       parseNumber,
       parseEof,
     ])(input),

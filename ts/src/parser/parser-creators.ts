@@ -11,6 +11,14 @@ export const mapParserResult = <T, R>(map: (result: T) => R, parser: Parser<T>) 
   return success(map(result.data), result.rest)
 }
 
+export const labelParser = <T>(parser: Parser<T>, expected: string) => (input: string) => {
+  const result = parser(input)
+  if (result.kind === 'failure') {
+    return failure(expected, result.actual)
+  }
+  return result
+}
+
 export const createTextParser = <T extends string>(match: T): Parser<T> => (input: string) => {
   if (input.startsWith(match)) {
     return success(match, input.slice(match.length))
