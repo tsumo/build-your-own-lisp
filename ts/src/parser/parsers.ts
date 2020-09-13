@@ -1,7 +1,16 @@
 import { success, failure } from './parse-result-creators'
 import { oneOfParsers } from './parser-combinators'
-import { createRegexParser, createTextParser, mapParserResult } from './parser-creators'
+import {
+  createLexemeParser,
+  createRegexParser,
+  createTextParser,
+  mapParserResult,
+} from './parser-creators'
 import { Parser } from './types'
+
+export const parseSpaces = createRegexParser(/\s*/)
+
+export const parseToken = createLexemeParser(parseSpaces)
 
 export const parseNumber = mapParserResult((x) => +x, createRegexParser(/\d+(?:\.\d+)?/))
 

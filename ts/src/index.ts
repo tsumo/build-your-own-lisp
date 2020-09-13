@@ -18,13 +18,12 @@ const addInputListener = (inputEl: HTMLTextAreaElement, outputEl: HTMLDivElement
 
     if (e.code === 'Enter') {
       e.preventDefault()
-      if (inputEl.value.trim().length === 0) {
+      if (inputEl.value.length === 0) {
         return
       }
-      const trimmedValue = inputEl.value.trim()
-      outputEl.innerHTML += `<p class="line">${parse(trimmedValue)}<p />`
+      outputEl.innerHTML += `<p class="line">${parse(inputEl.value)}<p />`
       outputEl.scrollTo({ top: outputEl.scrollHeight })
-      lastCommand = trimmedValue
+      lastCommand = inputEl.value
       inputEl.value = ''
       return
     }

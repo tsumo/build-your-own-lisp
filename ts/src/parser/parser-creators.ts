@@ -1,4 +1,5 @@
 import { success, failure } from './parse-result-creators'
+import { sequenceParsers } from './parser-combinators'
 import { Parser } from './types'
 
 export const mapParserResult = <T, R>(map: (result: T) => R, parser: Parser<T>) => (
@@ -36,4 +37,10 @@ export const createRegexParser = (regex: RegExp): Parser<string> => {
     const matchedText = match[0]
     return success(matchedText, input.slice(matchedText.length))
   }
+}
+
+/** Lexeme parser parses meaningful data and then skips the junk */
+export const createLexemeParser = <T>(junkParser: Parser<T>) => <U>(parser: Parser<U>) => {
+  const handleParsed = (data: U, _: T) => data
+  return sequenceParsers(handleParsed, [parser, junkParser])
 }

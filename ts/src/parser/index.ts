@@ -1,6 +1,6 @@
 import { sequenceParsers } from './parser-combinators'
 import { labelParser } from './parser-creators'
-import { parseOperation, parseNumber, parseEof } from './parsers'
+import { parseOperation, parseNumber, parseEof, parseSpaces, parseToken } from './parsers'
 import { ParseResult } from './types'
 
 const reportResult = (result: ParseResult<any>): string => {
@@ -11,10 +11,10 @@ const reportResult = (result: ParseResult<any>): string => {
   }
 }
 
-type ParsedData = [number, (num1: number, num2: number) => number, number, null]
+type ParsedData = [string, number, (num1: number, num2: number) => number, number, null]
 
 const handleParsed = <T extends ParsedData>(...args: T) => {
-  const [num1, operationHandler, num2] = args
+  const [_, num1, operationHandler, num2] = args
   return operationHandler(num1, num2)
 }
 
@@ -22,9 +22,10 @@ const handleParsed = <T extends ParsedData>(...args: T) => {
 export const parse = (input: string) =>
   reportResult(
     sequenceParsers<ParsedData, number>(handleParsed, [
-      parseNumber,
-      labelParser(parseOperation, 'an arithmetic operator'),
-      parseNumber,
+      parseSpaces, // skip leading spaces
+      parseToken(parseNumber),
+      parseToken(labelParser(parseOperation, 'an arithmetic operator')),
+      parseToken(parseNumber), // will skip trailing spaces
       parseEof,
     ])(input),
   )
