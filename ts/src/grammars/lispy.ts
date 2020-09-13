@@ -1,4 +1,4 @@
-import { oneOfParsers, sequenceParsers } from './../parser/parser-combinators'
+import { manyOfParser, oneOfParsers, sequenceParsers } from './../parser/parser-combinators'
 import { createTextParser, labelParser } from './../parser/parser-creators'
 import { parseEof, parseNumber, parseOperation, parseSpaces, parseToken } from './../parser/parsers'
 import { ParseResult } from './../parser/types'
@@ -16,14 +16,13 @@ const parseOpenParen = createTextParser('(')
 const parseCloseParen = createTextParser(')')
 
 const parseApplication = sequenceParsers<
-  [string, string, (num1: number, num2: number) => number, number, number, string, null],
+  [string, string, (...nums: number[]) => number, number[], string, null],
   number
->((spaces, open, op, num1, num2) => op(num1, num2), [
+>((spaces, open, op, nums) => op(...nums), [
   parseSpaces,
   parseToken(parseOpenParen),
   parseToken(labelParser(parseOperation, 'an arithmetic operation')),
-  parseToken(parseNumber),
-  parseToken(parseNumber),
+  parseToken(manyOfParser(parseSpaces, parseNumber)),
   parseToken(parseCloseParen),
   parseEof,
 ])

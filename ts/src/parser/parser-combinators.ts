@@ -47,3 +47,31 @@ export const oneOfParsers = <T extends Arr>(...parsers: [...Parsers<T>]) => (
   }
   return failure('oneOf', input)
 }
+
+/** Parses one or more values separated by another value */
+export const manyOfParser = <T, U>(separatorParser: Parser<U>, parser: Parser<T>) => (
+  input: string,
+): ParseResult<T[]> => {
+  const parsedData: T[] = []
+  let currentInput = input
+  while (currentInput.length > 0) {
+    if (parsedData.length > 0) {
+      const separatorResult = separatorParser(currentInput)
+      if (separatorResult.kind === 'failure') {
+        return success(parsedData, currentInput)
+      }
+      currentInput = separatorResult.rest
+    }
+    const result = parser(currentInput)
+    if (result.kind === 'failure') {
+      if (parsedData.length === 0) {
+        return result
+      } else {
+        return success(parsedData, currentInput)
+      }
+    }
+    currentInput = result.rest
+    parsedData.push(result.data)
+  }
+  return success(parsedData, currentInput)
+}
